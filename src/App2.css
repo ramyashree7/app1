@@ -1,0 +1,19 @@
+.gradient-custom-2 {
+  background: #35ca7d;
+}
+
+@media (min-width: 767px) {
+  .show-mobile {
+    display: none;
+  }
+}
+@media (min-width: 767px) {
+  .show-mobilee {
+    display: none;
+    /* font-size: 10px; */
+  }
+}
+.error {
+  color: red;
+  margin: -5px 0 10px;
+}

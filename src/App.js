@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import PrivateRoutes from "./component/PrivateRoutes";
+// PAGES
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import Reports from "./pages/Reports";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import NotFound from "./pages/NotFound";
+import Team from "./pages/Team";
+import Messages from "./pages/Messages";
+import Support from "./pages/Support";
+import Modal from "./pages/Modal";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { ToastContainer } from "react-toastify";
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<PrivateRoutes />}>
+            <Route path="/" element={<Home />} />
+          </Route>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+
+          <Route path="/products" element={<Products />} />
+          <Route path="/modal" element={<Modal />} />
+
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/not-found" element={<NotFound />} />
+        </Routes>
+      </Router>
+      <ToastContainer />
     </div>
   );
 }
-
-export default App;
