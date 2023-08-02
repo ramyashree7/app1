@@ -1,0 +1,22 @@
+{
+  "employees": [
+    {
+      "name": "Raj",
+      "email": "ramyaanchan2000@gmail.com",
+      "phone": "8296385775",
+      "id": 2
+    },
+    {
+      "name": "Raksha",
+      "email": "ramyaanchan2000@gmail.com",
+      "phone": "8296385775",
+      "id": 3
+    },
+    {
+      "name": "ghfgf",
+      "email": "ram@gmail.com",
+      "phone": "45566776676",
+      "id": 5
+    }
+  ]
+}
