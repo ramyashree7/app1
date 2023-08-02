@@ -8,7 +8,7 @@ import TableComponent from "./Phome";
 function Home() {
   const navigate = useNavigate();
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("access_token");
     navigate("/login");
   };
   const [collapsed, setCollapsed] = useState(false);

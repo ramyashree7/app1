@@ -1,15 +1,35 @@
 // TableComponent.js
 import React, { useState, useEffect } from "react";
 import "./phome.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import config from "../config.json";
+import { toast } from "react-toastify";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import "react-toastify/dist/ReactToastify.css";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import Card from "@mui/material/Card";
+import Fancybox from "./Fancybox";
+import CardContent from "@mui/material/CardContent";
+// import { Fancybox } from "@fancyapps/ui";
+// import "@fancyapps/ui/dist/fancybox/fancybox.css";
+import { isValidPhoneNumber } from "react-phone-number-input";
+import { Menu } from "react-pro-sidebar";
+import { makeStyles } from "@mui/styles";
+import ModalImage from "react-modal-image";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import "jspdf-autotable"; 
+import { Button } from "@mui/material";
+import { CSVLink } from "react-csv";
 import {
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
+  TableContainer,
   Toolbar,
   IconButton,
   TablePagination,
@@ -18,20 +38,53 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
   TextField,
   Box,
-  Container,
   useMediaQuery,
 } from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
-
+import Paper from "@mui/material/Paper";
 import { Add, Edit, Delete } from "@mui/icons-material";
 import axios from "axios";
+const useStyles = makeStyles({
+});
+
+const styles = {
+  table: {
+    border: "1px solid #ddd",
+    borderRadius: "100px", 
+  },
+  tableCell: {
+    border: "1px solid #ddd",
+    borderRadius: "10px", // Set border radius for individual cells
+    padding: "8px",
+    // Adjust other cell styles here (e.g., textAlign, fontWeight, etc.)
+  },
+};
 const TableComponent = () => {
-  const [data, setData] = useState([]);
+  const classes = useStyles();
+  const [editedImagePreviewUrl, setEditedImagePreviewUrl] = useState("");
+  const [variant, setVariant] = React.useState("soft");
+  const [color, setColor] = React.useState("neutral");
   const url = config.url;
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [valid, setValid] = useState(true);
+
+
+
+  const [newRecord, setNewRecord] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    image: null,
+  });
+
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editedRecord, setEditedRecord] = useState({
     id: null,
@@ -39,12 +92,12 @@ const TableComponent = () => {
     last_name: "",
     email: "",
     phone: "",
-    image: "",
+    image: null,
   });
+
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [recordToDeleteIndex, setRecordToDeleteIndex] = useState(null);
-
-  const [newRecord, setNewRecord] = useState({
+  const [errors, setErrors] = useState({
     first_name: "",
     last_name: "",
     email: "",
@@ -52,48 +105,154 @@ const TableComponent = () => {
     image: "",
   });
 
-  const handleAddClick = () => {
-    setShowAddDialog(true);
-  };
-  const [posts, setPosts] = useState([]);
-  const navigate = useNavigate();
-  const access_token = localStorage.getItem("access_token");
+  useEffect(() => {
+    fetchPosts();
+  }, [data]);
 
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get(`${url}/user/list_profile`, access);
+      // console.log(response);
+      setData(response.data.responseData);
+    } catch (error) {
+      console.error("Error fetching method:", error);
+    }
+  };
+
+  const access_token = localStorage.getItem("access_token");
   const access = {
     headers: {
       autherization: access_token,
     },
   };
 
-  useEffect(() => {
-    // Fetch posts from the server
-    fetchPosts();
-  }, []);
 
-  const fetchPosts = async () => {
-    try {
-      const response = await axios.get(`${url}/user/list_profile`, access);
-      console.log(response);
-      setData(response.data.responseData);
-    } catch (error) {
-      console.error("Error fetching method:", error);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(event.target.value);
+    setPage(0);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewRecord((prevRecord) => ({
+      ...prevRecord,
+      [name]: value,
+    }));
+    validateField(name, value);
+  };
+
+  const handlePhotoChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setNewRecord((prevRecord) => ({
+        ...prevRecord,
+        image: file,
+      }));
+      validateImage(file);
     }
   };
-  const [image, setImage] = useState("");
-  function handleImage(e) {
-    setImage(e.target.files[0]);
-  }
+
+
+
+  const handlephoneChange = (value) => {
+    setPhoneNumber(value);
+    // setValid(validatePhoneNumber(value));
+    console.log(value);
+  };
+
+  const isValidEmail = (email) => {
+    // Regular expression to validate email format
+    const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    return emailPattern.test(email);
+  };
+  const isFname = (first_name) => {
+    const fnamePattern = /^[A-Za-z0-9]{2,20}$/;
+    return fnamePattern.test(first_name);
+  };
+  const isLname = (last_name) => {
+    const lnamePattern = /^[A-Za-z0-9]{2,20}$/;
+    return lnamePattern.test(last_name);
+  };
+  const validateField = (fieldName, value) => {
+    let error = "";
+    switch (fieldName) {
+      case "first_name":
+        error = !value.trim()
+          ? "First name is required"
+          : !isFname(value)
+          ? "Please Enter valid name"
+          : "";
+        break;
+      case "last_name":
+        error = !value.trim() ? "Last name is required" : "";
+        break;
+      case "email":
+        error = !value.trim()
+          ? "Email is required"
+          : !isValidEmail(value)
+          ? "Please enter a valid email address"
+          : "";
+        break;
+        case "phone":
+          error=!value.trim()
+          ?"Phone number is required"
+          :""
+         break;
+      default:
+        break;
+    }
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [fieldName]: error,
+    }));
+  };
+
+  const validateImage = (image) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+    const maxFileSize = 2000000;
+
+    let error = "";
+
+    if (!image) {
+      error = "Image is required";
+    } else if (!allowedTypes.includes(image.type)) {
+      error = "Invalid image type. Allowed types are JPEG, PNG, and GIF.";
+    } else if (image.size > maxFileSize) {
+      error = "Image size exceeds the maximum allowed (2MB).";
+    }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      image: error,
+    }));
+  };
+
+  const validateAllFields = () => {
+    for (const fieldName in newRecord) {
+      validateField(fieldName, newRecord[fieldName]);
+    }
+  };
 
   var bodyFormData = new FormData();
   bodyFormData.append("first_name", newRecord.first_name);
   bodyFormData.append("last_name", newRecord.last_name);
   bodyFormData.append("email", newRecord.email);
-  bodyFormData.append("phone", newRecord.phone);
+  bodyFormData.append("phone", phoneNumber);
   bodyFormData.append("image", newRecord.image);
 
+  const handleAddClick = () => {
+    setShowAddDialog(true);
+  };
   const handleAddRecord = async (event) => {
     event.preventDefault();
+    validateAllFields();
     try {
+      const id = setData.id;
       const response1 = await axios.post(
         `${url}/user/add_profile`,
         bodyFormData,
@@ -101,6 +260,7 @@ const TableComponent = () => {
       );
       console.log(response1);
       if (response1.data.responseCode === 200) {
+        setData((prevData) => [...prevData, newRecord]);
         setNewRecord({
           first_name: "",
           last_name: "",
@@ -108,82 +268,104 @@ const TableComponent = () => {
           phone: "",
           image: "",
         });
-        fetchPosts();
+        // fetchPosts();
+        toast.success("data added successfully", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setShowAddDialog(false);
+      } else {
+        toast.error(response1.data.responseMessage, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
     } catch (error) {
-      console.error("Error fetching method:", error);
+      toast.error("Error fetching method:", error, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   };
 
-  //   setData((prevData) => [...prevData, { ...newRecord, id: uuidv4() }]);
-  //   setNewRecord({ fname: "", lname: "", email: "", phone: "", image: "" });
-  //   setShowAddDialog(false);
-  //   try {
-  //     const response = await axios.post(
-  //       "https://3d81-103-141-112-27.ngrok-free.app/api/user/add_profile",
-  //       newRecord,
-  //       {
-  //         headers: { autherization: ` ${access_token}` },
-  //       }
-  //     );
-  //     if (response.status === 201) {
-  //       setNewRecord({ fname: "", lname: "", email: "", phone: "", image: "" });
-  //       fetchPosts();
-  //     }
-  //   } catch (error) {
-  //     console.error("Error :", error);
-  //   }
-
-  const [page, setPage] = useState();
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChange2 = (e) => {
+    const { name, value } = e.target;
+    setEditedRecord((prevEditedRecord) => ({
+      ...prevEditedRecord,
+      [name]: value,
+    }));
+    validateField(name, value);
   };
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+
+
+  const handlePhotoChange2 = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setEditedRecord((prevRecord) => ({
+        ...prevRecord,
+        image: file,
+      }));
+      validateImage(file);
+
+      // Set the preview URL of the selected image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditedImagePreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setEditedRecord((prevRecord) => ({
+        ...prevRecord,
+        image: null,
+      }));
+      setEditedImagePreviewUrl("");
+    }
   };
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+
+  const validateAllFields2 = () => {
+    for (const fieldName in editedRecord) {
+      validateField(fieldName, editedRecord[fieldName]);
+    }
+  };
+
+  var bodyFormData1 = new FormData();
+  bodyFormData1.append("first_name", editedRecord.first_name);
+  bodyFormData1.append("last_name", editedRecord.last_name);
+  bodyFormData1.append("email", editedRecord.email);
+  bodyFormData1.append("phone", editedRecord.phone);
+  bodyFormData1.append("image", editedRecord.image);
 
   const handleEditClick = (index) => {
-    const recordToEdit = data[index];
+    const recordToEdit = data[index - 1];
+    console.log(recordToEdit);
     setEditedRecord({ ...recordToEdit });
     setShowEditDialog(true);
   };
 
-  const handleUpdateRecord = async (event,id) => {
+  const handleUpdateRecord = async (event, id) => {
     event.preventDefault();
-    // setData((prevData) => {
-    //   const updatedData = [...prevData];
-    //   const index = prevData.findIndex(
-    //     (record) => record.first_name === editedRecord.first_name
-    //   );
-    //   updatedData[index] = editedRecord;
-    //   return updatedData;
-    // });
-    // setEditedRecord({ fname: "", lname: "", email: "", phone: "", image: "" });
-    // setShowEditDialog(false);
+
+    validateAllFields2();
     try {
-      const response3 = await axios.put(
-        `${url}/user/update_profile/63ecabf109101356a91f96e2${id}`,
-       
+      const response2 = await axios.put(
+        `${url}/user/update_profile/${editedRecord.id}`,
+        bodyFormData1,
         access
       );
-      console.log(response3);
-      if (response3.data.responseCode === 200) {
-        setEditedRecord({
-          first_name: "",
-          last_name: "",
-          email: "",
-          phone: "",
-          image: "",
-        });
+      console.log(editedRecord.id);
+      console.log(response2);
+      if (response2.data.responseCode === 200) {
+        setShowEditDialog(false);
         fetchPosts();
+        toast.success("data edited successfully", {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      } else {
+        toast.error(response2.data.responseMessage, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
       }
     } catch (error) {
-      console.error("Error fetching method:", error);
+      toast.error("Error fetching method:", error, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   };
 
@@ -191,182 +373,440 @@ const TableComponent = () => {
     setRecordToDeleteIndex(index);
     setShowDeleteDialog(true);
   };
-
   const handleConfirmDelete = async (id) => {
-    // setData((prevData) => {
-    //   const updatedData = prevData.filter(
-    //     (_, index) => index !== recordToDeleteIndex
-    //   );
-    //   return updatedData;
-    // });
-    setShowDeleteDialog(false);
     try {
-      const response2 = await axios.delete(
-        `${url}/user/delete_profile/637372d3fe64f3e17202f272/${id}`,
-        access
-      );
-      console.log(response2);
-      if (response2.data.responseCode === 200) {
-        setData((prevData) =>
-          prevData.filter((_, index) => index !== recordToDeleteIndex)
-        );
-        fetchPosts();
-      }
+      const response3 = await axios
+        .delete(`${url}/user/delete_profile/${recordToDeleteIndex}`, access)
+        .then((response3) => {
+          console.log(response3);
+          console.log("deleted", recordToDeleteIndex);
+          toast.success("Data is deleted successfully", {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        });
+      setShowDeleteDialog(false);
     } catch (error) {
-      console.error("Error deleting post:", error);
+      toast.error("Error fetching method:", error, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   };
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const [validationErrors, setValidationErrors] = useState({
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone: "",
-    image: "",
-  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredData, setFilteredData] = useState(data);
+  useEffect(() => {
+    const filteredResults = data.filter((record) => {
+      const fullName = `${record.first_name} ${record.last_name}`.toLowerCase();
+      return fullName.includes(searchQuery.toLowerCase());
+    });
+    setFilteredData(filteredResults);
+  }, [data, searchQuery]);
 
-  const isEmailValid = (email) => {
-    // Regular expression to validate email format
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailPattern.test(email);
+  const handleChangeSearch = (e) => {
+    setSearchQuery(e.target.value);
   };
-  const isFname = (first_name) => {
-    const fnamePattern = /^[A-Za-z]{2,20}$/;
-    return fnamePattern.test(first_name);
+
+  const generatePDF = (data) => {
+    const doc = new jsPDF();
+    const tableColumn = ["First Name", "Last Name", "Email", "Phone", "Image"];
+    const tableRows = [];
+
+    data.forEach((record) => {
+      const rowData = [
+        record.first_name,
+        record.last_name,
+        record.email,
+        record.phone,
+        record.image, // Update this to show the image, as needed
+      ];
+      tableRows.push(rowData);
+    });
+
+    const imageColumnIndex = 4;
+
+    // Add the image to each row using a loop
+    data.forEach((record, index) => {
+      // Assuming that the 'record.image' contains a valid image URL or Data URI
+      doc.addImage(
+        record.image, // URL or Data URI of the image
+        // "PNG", // Image format (JPEG, PNG, etc.)
+        10, // X-coordinate position
+        20 + index * 10, // Y-coordinate position (you can adjust the value as needed)
+        10, // Image width
+        10 // Image height
+      );
+
+      // Update the 'rowData' with the image element
+      tableRows[index][imageColumnIndex] = {
+        // Add the image element to the table cell
+        image: doc.previousImage,
+        alignment: "left", // Adjust the alignment as needed
+      };
+    });
+    // didDrawCell:(data)=>{
+    //   if(data.section==="body"&& data.column.index===5){
+    //     doc.addImage(data.cell.row,
+    //       "jPEG,png,jpg,heic",
+    //       data.cell.x +2,
+    //       data.cell.y+2,
+    //       31.5,25);
+    //   }
+    // })
+    // }
+
+    const columnWidths = [30, 30, 30, 30, 50, 20]; // Example widths, adjust as needed
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      columnStyles: {
+        0: { columnWidth: columnWidths[0] },
+        1: { columnWidth: columnWidths[1] },
+        2: { columnWidth: columnWidths[2] },
+        3: { columnWidth: columnWidths[3] },
+        4: { columnWidth: columnWidths[4] },
+        5: { columnWidth: columnWidths[5] },
+      },
+    });
+
+    doc.save("table_data.pdf");
   };
-  const isLname = (last_name) => {
-    const lnamePattern = /^[A-Za-z]{2,20}$/;
-    return lnamePattern.test(last_name);
-  };
-  const isphone = (phone) => {
-    const phonePattern = /^\d{10}$/;
-    return phonePattern.test(phone);
-  };
+
+  const headers = [
+    { label: "First Name", key: "first_name" },
+    { label: "Last Name", key: "last_name" },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "phone" },
+
+    // Add more headers for your table data
+  ];
 
   return (
     <div style={{ overflowX: isMobileView ? "auto" : "hidden" }}>
-      <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: 1 }}
-        ></Typography>
-        <IconButton color="primary" onClick={handleAddClick}>
-          <Add />
-        </IconButton>
-      </Toolbar>
-      <Table>
-        <TableHead sx={{}}>
-          <TableRow>
-            <TableCell style={{ borderBottom: "1px solid black" }}>
-              First Name
-            </TableCell>
-            <TableCell style={{ borderBottom: "1px solid black" }}>
-              Last Name
-            </TableCell>
-            <TableCell style={{ borderBottom: "1px solid black" }}>
-              Email
-            </TableCell>
-            <TableCell style={{ borderBottom: "1px solid black" }}>
-              Phone
-            </TableCell>
-            <TableCell style={{ borderBottom: "1px solid black" }}>
-              Image
-            </TableCell>
-            <TableCell
-              style={{
-                borderBottom: "1px solid black",
-                padding: "20px",
-                marginLeft: "10px",
-              }}
-            >
-              Action
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((record, index) => (
-              <TableRow key={index}>
-                <TableCell style={{ borderBottom: "1px solid black" }}>
-                  {record.first_name}
-                </TableCell>
-                <TableCell style={{ borderBottom: "1px solid black" }}>
-                  {record.last_name}
-                </TableCell>
-                <TableCell style={{ borderBottom: "1px solid black" }}>
-                  {record.email}
-                </TableCell>
-                <TableCell style={{ borderBottom: "1px solid black" }}>
-                  {record.phone}
-                </TableCell>
-                <TableCell style={{ borderBottom: "1px solid black" }}>
-                  <img src={record.image} style={{ maxWidth: "50px" }} />
-                </TableCell>
-                <TableCell
-                  style={{ borderBottom: "1px solid black", padding: "10px" }}
+      <Card style={{ borderRadius: "20px", borderBottom: "white" }}>
+        <CardContent>
+          <Toolbar className="head-layout">
+            <Typography
+              variant="h6"
+              // component="div"
+            ></Typography>
+
+            <TextField
+              label="Search by Name"
+              value={searchQuery}
+              onChange={handleChangeSearch}
+              size="small"
+              variant="outlined"
+              style={{ width: "250px" }}
+            />
+            <div className="icons">
+              <IconButton
+                color="primary"
+                onClick={handleAddClick}
+                style={{
+                  backgroundColor: "#eeeeee",
+                  marginLeft: "20px",
+                }}
+              >
+                <Add />
+              </IconButton>
+              <IconButton
+                color="primary"
+                style={{
+                  backgroundColor: "#eeeeee",
+                  marginLeft: "20px",
+                }}
+                onClick={() => generatePDF(filteredData)}
+              >
+                <PictureAsPdfIcon />
+              </IconButton>
+              <IconButton
+                style={{
+                  backgroundColor: "#eeeeee",
+                  marginLeft: "20px",
+                }}
+              >
+                <CSVLink
+                  data={data}
+                  headers={headers}
+                  filename={"table_data.csv"}
+                  style={{ textDecorationLine: "none", fontSize: "16px" }}
                 >
-                  {/* Edit Icon */}
-                  <IconButton
-                    sx={{ p: "1" }}
-                    color="primary"
-                    onClick={() => handleEditClick(index)}
-                  >
-                    <Edit />
-                  </IconButton>
+                  csv
+                  {/* <i class="fas fa-file-csv"></i> */}
+                </CSVLink>
+              </IconButton>
+            </div>
+          </Toolbar>
+          <Paper
+            sx={{
+              width: "100%",
+              borderBottomColor: "white",
+              boxShadow: "none",
+            }}
+          >
+            {filteredData.length > 0 ? (
+              <TableContainer sx={{ maxHeight: 450 }}>
+                <Table
+                  stickyHeader
+                  aria-label="sticky table"
+                  className={classes.table}
+                >
+                  <TableHead sx={{}}>
+                    <TableRow>
+                      <TableCell>
+                        <b> First Name</b>
+                      </TableCell>
+                      <TableCell>
+                        <b>Last Name</b>
+                      </TableCell>
+                      <TableCell>
+                        <b> Email</b>
+                      </TableCell>
+                      <TableCell>
+                        <b>Phone</b>
+                      </TableCell>
+                      <TableCell>
+                        <b>Image</b>
+                      </TableCell>
+                      <TableCell></TableCell>
 
-                  {/* Delete Icon */}
-                  <IconButton
-                    sx={{ m: "1" }}
-                    color="secondary"
-                    onClick={() => handleDeleteClick(index)}
-                  >
-                    <Delete />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={4} />
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <TablePagination
-   
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={data.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
+                      <TableCell
+                        style={{
+                          padding: "30px",
+                          marginLeft: "30px",
+                        }}
+                      >
+                        <b> Action</b>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredData
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((record, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{record.first_name}</TableCell>
+                          <TableCell>{record.last_name}</TableCell>
+                          <TableCell>{record.email}</TableCell>
+                          <TableCell>{record.phone}</TableCell>
+                          <TableCell
+                            style={{
+                              maxWidth: "50px",
+                              maxHeight: "20px",
+                            }}
+                          >
+                            {/* <ModalImage
+                          small={record.image}
+                          large={record.image}
+                          alt="Hello World!"
+                          style={{ height: "50px", width: "80px" }}
+                        /> */}
 
-        // rowsPerPageOptions={[5, 10, 25]}
-        // component="div"
-        // count={rows.length}
-        // rowsPerPage={rowsPerPage}
-        // page={page}
-        // onPageChange={handleChangePage}
-        // onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+                            <Fancybox
+                              options={{
+                                Carousel: {
+                                  infinite: false,
+                                },
+                              }}
+                            >
+                              <a data-fancybox="gallery">
+                                <img
+                                  alt=""
+                                  src={record.image}
+                                  width="80"
+                                  height="80"
+                                />
+                              </a>
+                            </Fancybox>
+                          </TableCell>
+                          <TableCell
+                            style={{
+                              padding: "10px",
+                            }}
+                          ></TableCell>
+                          <TableCell
+                            style={{
+                              padding: "10px",
+                            }}
+                          >
+                            <IconButton
+                              sx={{ p: "1" }}
+                              color="primary"
+                              style={{
+                                gap: "5",
+                                backgroundColor: "#eeeeee",
+                                margin: "20px",
+                              }}
+                              onClick={() => handleEditClick(record.index)}
+                            >
+                              <Edit />
+                            </IconButton>
 
-      <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}>
-        <DialogTitle>Add New Record</DialogTitle>
+                            <IconButton
+                              style={{
+                                gap: "5",
+                                backgroundColor: "#eeeeee",
+                                marginLeft: "17px",
+                              }}
+                              sx={{ m: "1" }}
+                              color="secondary"
+                              onClick={() => handleDeleteClick(record.id)}
+                            >
+                              <Delete />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : (
+              <Typography
+                variant="body2"
+                component="div"
+                sx={{ textAlign: "center", my: 3 }}
+              >
+                No records found.
+              </Typography>
+            )}
+            <Box display="flex" justifyContent="flex-end" sx={{ mt: 2 }}>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={data.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                SelectProps={{
+                  renderValue: (value) => `${value} rows`, // Custom label for the dropdown button
+                }}
+                MenuItemProps={{
+                  style: { fontSize: 14, margin: "1px" }, // Custom style for the dropdown options
+                }}
+              />
+            </Box>
+          </Paper>
+        </CardContent>
+      </Card>
+      <Card>
+        <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}>
+          {/* <Card style={{ overflowX: isMobileView ? "auto" : "hidden" }}> */}
+          <DialogTitle sx={{ textAlign: "center" }}>Add New Record</DialogTitle>
+          <DialogContent>
+            <Box
+              component="form"
+              className="box-layout"
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                id="outlined-basic"
+                variant="outlined"
+                label="First Name"
+                name="first_name"
+                type="text"
+                value={newRecord.first_name}
+                onChange={handleChange}
+                size="small"
+                style={{
+                  borderColor: errors.first_name ? "red" : "green",
+                }}
+              />
+              {errors.first_name && (
+                <p style={{ color: "red" }}>{errors.first_name}</p>
+              )}
+              <TextField
+                label="Last Name"
+                type="text"
+                name="last_name"
+                size="small"
+                fullWidth
+                value={newRecord.last_name}
+                onChange={handleChange}
+                style={{
+                  borderColor: errors.last_name ? "red" : "green",
+                }}
+              />
+              {errors.last_name && (
+                <p style={{ color: "red" }}>{errors.last_name}</p>
+              )}
+              <TextField
+                label="Email"
+                type="email"
+                name="email"
+                size="small"
+                fullWidth
+                value={newRecord.email}
+                onChange={handleChange}
+                style={{
+                  borderColor: errors.email ? "red" : "green",
+                  // borderWidth: "2px",
+                }}
+              />
+              {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
+              <PhoneInput
+                value={phoneNumber}
+                onChange={handlephoneChange}
+                country={"in"}
+                inputStyle={{
+                  paddingTop: "1.2rem",
+                  // margin:"5px",
+                  paddingBottom: "1.2rem",
+                  height: "calc(1.5em+1.25rem+2px)",
+                  width: "100%",
+                  fontWeight: 400,
+                  lineHeight: 1.5,
+                  color: "#000",
+
+                  fontSize: "17px",
+                }}
+                dropdownStyle={{}}
+                buttonStyle={{
+                  background: "#c5d3e380",
+                  display: "block",
+                }}
+                enableSearch
+                isValid={(value, country) => {
+                  if (value === country.dialCode) {
+                    return true;
+                  }
+                  return isValidPhoneNumber("+" + value);
+                }}
+                defaultErrorMessage="Please enter valid number"
+              />  {errors.phone && <p style={{ color: "red" }}>{errors.phone}</p>}
+              <TextField
+                // label="Image"
+                type="file"
+                size="small"
+                name="image"
+                fullWidth
+                onChange={handlePhotoChange}
+              />
+              {errors.image && <p style={{ color: "red" }}>{errors.image}</p>}
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
+            <Button onClick={handleAddRecord} color="primary">
+              Add
+            </Button>
+          </DialogActions>
+          {/* </Card> */}
+        </Dialog>
+      </Card>
+      <Dialog open={showEditDialog} onClose={() => setShowEditDialog(false)}>
+        <DialogTitle sx={{ textAlign: "center" }}>Edit Record</DialogTitle>
         <DialogContent>
           <Box
             component="form"
-            sx={{
-              display: "Grid",
-              flexDirection: "column",
-              m: 1,
-              width: "40ch",
-              gap: 4,
-            }}
+            className="box-layout"
             noValidate
             autoComplete="off"
           >
@@ -374,156 +814,105 @@ const TableComponent = () => {
               id="outlined-basic"
               variant="outlined"
               label="First Name"
+              name="first_name"
               type="text"
-              value={newRecord.first_name}
-              onChange={(e) =>
-                setNewRecord((prevRecord) => ({
-                  ...prevRecord,
-                  first_name: e.target.value,
-                }))
-              }
+              size="small"
+              value={editedRecord.first_name}
+              onChange={handleChange2}
               fullWidth
+              style={{
+                borderColor: errors.first_name ? "red" : "green",
+                margin: "5px,5px",
+              }}
             />
+            {errors.first_name && (
+              <p style={{ color: "red" }}>{errors.first_name}</p>
+            )}
             <TextField
               label="Last Name"
               type="text"
-              value={newRecord.last_name}
-              onChange={(e) =>
-                setNewRecord((prevRecord) => ({
-                  ...prevRecord,
-                  last_name: e.target.value,
-                }))
-              }
+              name="last_name"
+              size="small"
+              value={editedRecord.last_name}
+              onChange={handleChange2}
+              style={{
+                borderColor: errors.last_name ? "red" : "green",
+              }}
               fullWidth
             />
+            {errors.last_name && (
+              <p style={{ color: "red" }}>{errors.last_name}</p>
+            )}
             <TextField
               label="Email"
               type="email"
-              value={newRecord.email}
-              onChange={(e) =>
-                setNewRecord((prevRecord) => ({
-                  ...prevRecord,
-                  email: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="phone"
-              type="number"
-              value={newRecord.phone}
-              onChange={(e) =>
-                setNewRecord((prevRecord) => ({
-                  ...prevRecord,
-                  phone: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="Image"
-              type="file"
-              value={newRecord.image}
-              // onChange={(e) =>
-              //   setNewRecord((prevRecord) => ({
-              //     ...prevRecord,
-              //     image: e.target.value,
-              //   }))
-              // }
-              onChange={handleImage}
-              fullWidth
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
-          <Button onClick={handleAddRecord} color="primary">
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={showEditDialog} onClose={() => setShowEditDialog(false)}>
-        <DialogTitle>Edit Record</DialogTitle>
-        <DialogContent>
-          <Box
-            component="form"
-            sx={{
-              display: "Grid",
-              flexDirection: "column",
-              m: 1,
-              width: "40ch",
-              gap: 4,
-            }}
-            noValidate
-            autoComplete="off"
-          >
-            <TextField
-              label="First Name"
-              type="text"
-              value={editedRecord.fname}
-              onChange={(e) =>
-                setEditedRecord((prevRecord) => ({
-                  ...prevRecord,
-                  fname: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-
-            <TextField
-              label="Last Name"
-              type="text"
-              value={editedRecord.lname}
-              onChange={(e) =>
-                setEditedRecord((prevRecord) => ({
-                  ...prevRecord,
-                  lname: e.target.value,
-                }))
-              }
-              fullWidth
-            />
-            <TextField
-              label="Email"
-              type="email"
+              name="email"
+              size="small"
               value={editedRecord.email}
-              onChange={(e) =>
-                setEditedRecord((prevRecord) => ({
-                  ...prevRecord,
-                  email: e.target.value,
-                }))
-              }
+              onChange={handleChange2}
+              style={{
+                borderColor: errors.email ? "red" : "green",
+              }}
               fullWidth
             />
+            {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
+            <PhoneInput
+              value={phoneNumber}
+              onChange={handlephoneChange}
+              country={"in"}
+              inputStyle={{
+                paddingTop: "1.2rem",
+                paddingBottom: "1.2rem",
+                height: "calc(1.0em+0.25rem+1px)",
+                width: "100%",
+                fontWeight: 400,
+                lineHeight: 1.5,
+                color: "#000",
+                fontFamily: "Poppins",
+                fontSize: "17px",
+              }}
+              dropdownStyle={{ fontFamily: "Poppins" }}
+              buttonStyle={{
+                background: "#c5d3e380",
+              }}
+              enableSearch
+              isValid={(value, country) => {
+                if (value === country.dialCode) {
+                  return true;
+                }
+                return isValidPhoneNumber("+" + value);
+              }}
+              defaultErrorMessage="Please enter valid number"
+            /> {errors.image && <p style={{ color: "red" }}>{errors.image}</p>}
             <TextField
-              label="Phone"
-              type="number"
-              value={editedRecord.phone}
-              onChange={(e) =>
-                setEditedRecord((prevRecord) => ({
-                  ...prevRecord,
-                  phone: e.target.value,
-                }))
-              }
+              size="small"
+              type="file"
+              // value={editedImagePreviewUrl}
+              name="image"
+              onChange={handlePhotoChange2}
               fullWidth
+              accept="image/*"
             />
-            <TextField
-              label="Image"
-              // type="file"
-              value={editedRecord.image}
-              onChange={(e) =>
-                setEditedRecord((prevRecord) => ({
-                  ...prevRecord,
-                  image: e.target.value,
-                }))
-              }
-              fullWidth
-            />
+            {editedImagePreviewUrl && (
+              <div>
+                <img
+                  src={editedImagePreviewUrl}
+                  alt="Preview"
+                  style={{
+                    width: "50px",
+                    height: "50px",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            )}
+
+            {errors.image && <p style={{ color: "red" }}>{errors.image}</p>}
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowEditDialog(false)}>Cancel</Button>
-          <Button onClick={handleUpdateRecord} color="primary">
+          <Button onClick={(id) => handleUpdateRecord(id)} color="primary">
             Update
           </Button>
         </DialogActions>
@@ -539,7 +928,10 @@ const TableComponent = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} color="secondary">
+          <Button
+            onClick={(record) => handleConfirmDelete(record.id)}
+            color="secondary"
+          >
             Delete
           </Button>
         </DialogActions>

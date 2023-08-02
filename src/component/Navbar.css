@@ -1,7 +1,8 @@
 .navbar {
-    background-color:#e1e1e1;
+    background-color:#da0f0f;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
     font-size: 14px;
+    position: absolute;
   }

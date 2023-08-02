@@ -78,8 +78,10 @@ body {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    background-color: #beebd4;
+    background-color:whitesmoke;
+   height: 100vh;
     box-shadow: none;
+    // position: relative;
     
     header {
       margin-bottom: 16px;

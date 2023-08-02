@@ -11,7 +11,6 @@ import {
   SidebarContent,
 } from "react-pro-sidebar";
 import React from "react";
-// import "./Navbar.css";
 import "../styles.scss";
 import { NavLink, Link } from "react-router-dom";
 
@@ -61,7 +60,7 @@ const Navbar = ({
         <SidebarContent>
           <Menu iconShape="circle">
             <MenuItem icon={<AiFillHome />}>
-              Demo
+              Home
               <NavLink to="/" />
             </MenuItem>
             <MenuItem icon={<BiSolidReport />}>

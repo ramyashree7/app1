@@ -5,8 +5,8 @@ import PrivateRoutes from "./component/PrivateRoutes";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Reports from "./pages/Reports";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Loginpage from "./pages/Login";
+import Registerpage from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Team from "./pages/Team";
 import Messages from "./pages/Messages";
@@ -23,8 +23,8 @@ export default function App() {
           <Route path="/" element={<PrivateRoutes />}>
             <Route path="/" element={<Home />} />
           </Route>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Registerpage />} />
+          <Route path="/login" element={<Loginpage />} />
 
           <Route path="/products" element={<Products />} />
           <Route path="/modal" element={<Modal />} />

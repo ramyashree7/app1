@@ -1,4 +1,18 @@
-// validation.js
-export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-export const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-export const unameRegex=/^[A-Za-z]{2,20}$/
+import React from 'react'
+
+function Validation() {
+
+
+    
+  return (
+    <div>
+        
+
+
+
+        
+    </div>
+  )
+}
+
+export default Validation
