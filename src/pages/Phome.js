@@ -442,6 +442,7 @@ const TableComponent = () => {
         4: { columnWidth: columnWidths[4] },
       },
     });
+    
     doc.save("table_data.pdf");
   };
 
