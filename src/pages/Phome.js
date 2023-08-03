@@ -1,4 +1,3 @@
-// TableComponent.js
 import React, { useState, useEffect } from "react";
 import "./phome.css";
 import { useNavigate } from "react-router-dom";
@@ -10,17 +9,13 @@ import "react-toastify/dist/ReactToastify.css";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Card from "@mui/material/Card";
-import Fancybox from "./Fancybox";
 import CardContent from "@mui/material/CardContent";
-// import { Fancybox } from "@fancyapps/ui";
-// import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import { isValidPhoneNumber } from "react-phone-number-input";
-import { Menu } from "react-pro-sidebar";
+import { PhoneNumber, isValidPhoneNumber } from "libphonenumber-js";
 import { makeStyles } from "@mui/styles";
 import ModalImage from "react-modal-image";
-import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
-import "jspdf-autotable"; 
+import "jspdf-autotable";
+import html2canvas from "html2canvas";
 import { Button } from "@mui/material";
 import { CSVLink } from "react-csv";
 import {
@@ -45,19 +40,16 @@ import {
 import Paper from "@mui/material/Paper";
 import { Add, Edit, Delete } from "@mui/icons-material";
 import axios from "axios";
-const useStyles = makeStyles({
-});
-
+const useStyles = makeStyles({});
 const styles = {
   table: {
     border: "1px solid #ddd",
-    borderRadius: "100px", 
+    borderRadius: "100px",
   },
   tableCell: {
     border: "1px solid #ddd",
-    borderRadius: "10px", // Set border radius for individual cells
+    borderRadius: "10px",
     padding: "8px",
-    // Adjust other cell styles here (e.g., textAlign, fontWeight, etc.)
   },
 };
 const TableComponent = () => {
@@ -71,12 +63,11 @@ const TableComponent = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
   const [phoneNumber, setPhoneNumber] = useState("");
   const [valid, setValid] = useState(true);
-
-
-
+  const [editedPhoneNumber, setEditedPhoneNumber] = useState("");
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
+  const [previousImagePreviewUrl, setPreviousImagePreviewUrl] = useState("");
   const [newRecord, setNewRecord] = useState({
     first_name: "",
     last_name: "",
@@ -84,7 +75,6 @@ const TableComponent = () => {
     phone: "",
     image: null,
   });
-
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editedRecord, setEditedRecord] = useState({
     id: null,
@@ -94,7 +84,6 @@ const TableComponent = () => {
     phone: "",
     image: null,
   });
-
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [recordToDeleteIndex, setRecordToDeleteIndex] = useState(null);
   const [errors, setErrors] = useState({
@@ -104,7 +93,6 @@ const TableComponent = () => {
     phone: "",
     image: "",
   });
-
   useEffect(() => {
     fetchPosts();
   }, [data]);
@@ -112,22 +100,17 @@ const TableComponent = () => {
   const fetchPosts = async () => {
     try {
       const response = await axios.get(`${url}/user/list_profile`, access);
-      // console.log(response);
       setData(response.data.responseData);
     } catch (error) {
       console.error("Error fetching method:", error);
     }
   };
-
   const access_token = localStorage.getItem("access_token");
   const access = {
     headers: {
       autherization: access_token,
     },
   };
-
-
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -136,7 +119,6 @@ const TableComponent = () => {
     setRowsPerPage(event.target.value);
     setPage(0);
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewRecord((prevRecord) => ({
@@ -145,7 +127,6 @@ const TableComponent = () => {
     }));
     validateField(name, value);
   };
-
   const handlePhotoChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -154,19 +135,30 @@ const TableComponent = () => {
         image: file,
       }));
       validateImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setNewRecord((prevRecord) => ({
+        ...prevRecord,
+        image: null,
+      }));
+      setImagePreviewUrl("");
     }
   };
-
-
-
   const handlephoneChange = (value) => {
     setPhoneNumber(value);
-    // setValid(validatePhoneNumber(value));
-    console.log(value);
+    validateField("phone", value);
+  };
+
+  const handlephoneChange2 = (value) => {
+    setEditedPhoneNumber(value);
+    validateField("phone", value);
   };
 
   const isValidEmail = (email) => {
-    // Regular expression to validate email format
     const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     return emailPattern.test(email);
   };
@@ -198,11 +190,16 @@ const TableComponent = () => {
           ? "Please enter a valid email address"
           : "";
         break;
-        case "phone":
-          error=!value.trim()
-          ?"Phone number is required"
-          :""
-         break;
+      case "phone":
+        error = !phoneNumber.trim()
+          ? "Phone number is required"
+          : !isValidPhoneNumber("+" + phoneNumber)
+          ? "Please enter a valid phonenumber"
+          : "";
+        break;
+      case "image":
+        error = !value ? "Image is required" : !validateImage(value) ? "" : "";
+        break;
       default:
         break;
     }
@@ -216,9 +213,7 @@ const TableComponent = () => {
   const validateImage = (image) => {
     const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
     const maxFileSize = 2000000;
-
     let error = "";
-
     if (!image) {
       error = "Image is required";
     } else if (!allowedTypes.includes(image.type)) {
@@ -244,7 +239,6 @@ const TableComponent = () => {
   bodyFormData.append("email", newRecord.email);
   bodyFormData.append("phone", phoneNumber);
   bodyFormData.append("image", newRecord.image);
-
   const handleAddClick = () => {
     setShowAddDialog(true);
   };
@@ -252,7 +246,6 @@ const TableComponent = () => {
     event.preventDefault();
     validateAllFields();
     try {
-      const id = setData.id;
       const response1 = await axios.post(
         `${url}/user/add_profile`,
         bodyFormData,
@@ -261,6 +254,8 @@ const TableComponent = () => {
       console.log(response1);
       if (response1.data.responseCode === 200) {
         setData((prevData) => [...prevData, newRecord]);
+        setPhoneNumber("");
+        setImagePreviewUrl("");
         setNewRecord({
           first_name: "",
           last_name: "",
@@ -268,11 +263,11 @@ const TableComponent = () => {
           phone: "",
           image: "",
         });
-        // fetchPosts();
-        toast.success("data added successfully", {
+        toast.success("Data added successfully", {
           position: toast.POSITION.TOP_RIGHT,
         });
         setShowAddDialog(false);
+        // fetchPosts();
       } else {
         toast.error(response1.data.responseMessage, {
           position: toast.POSITION.TOP_RIGHT,
@@ -294,7 +289,6 @@ const TableComponent = () => {
     validateField(name, value);
   };
 
-
   const handlePhotoChange2 = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -303,8 +297,6 @@ const TableComponent = () => {
         image: file,
       }));
       validateImage(file);
-
-      // Set the preview URL of the selected image
       const reader = new FileReader();
       reader.onloadend = () => {
         setEditedImagePreviewUrl(reader.result);
@@ -329,19 +321,22 @@ const TableComponent = () => {
   bodyFormData1.append("first_name", editedRecord.first_name);
   bodyFormData1.append("last_name", editedRecord.last_name);
   bodyFormData1.append("email", editedRecord.email);
-  bodyFormData1.append("phone", editedRecord.phone);
+  bodyFormData1.append("phone", editedPhoneNumber);
   bodyFormData1.append("image", editedRecord.image);
 
   const handleEditClick = (index) => {
     const recordToEdit = data[index - 1];
+    // const recordToEdit = data.find((record) => record.index === index);
     console.log(recordToEdit);
     setEditedRecord({ ...recordToEdit });
+    setEditedPhoneNumber(recordToEdit.phone);
+    setPreviousImagePreviewUrl(recordToEdit.image);
+    setEditedImagePreviewUrl(recordToEdit.image);
     setShowEditDialog(true);
   };
 
   const handleUpdateRecord = async (event, id) => {
     event.preventDefault();
-
     validateAllFields2();
     try {
       const response2 = await axios.put(
@@ -354,7 +349,7 @@ const TableComponent = () => {
       if (response2.data.responseCode === 200) {
         setShowEditDialog(false);
         fetchPosts();
-        toast.success("data edited successfully", {
+        toast.success("Data edited successfully", {
           position: toast.POSITION.TOP_RIGHT,
         });
       } else {
@@ -408,56 +403,34 @@ const TableComponent = () => {
   const handleChangeSearch = (e) => {
     setSearchQuery(e.target.value);
   };
-
   const generatePDF = (data) => {
     const doc = new jsPDF();
-    const tableColumn = ["First Name", "Last Name", "Email", "Phone", "Image"];
+    const tableColumn = ["Name", "Email", "Phone", "Image"];
     const tableRows = [];
+    const urlToImageObject = async (url) => {
+      const canvas = await html2canvas(document.createElement("img"));
+      const imgData = url.startsWith("data:image")
+        ? url
+        : canvas.toDataURL(url);
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = imgData;
+      });
+    };
 
     data.forEach((record) => {
+      const fullName = `${record.first_name} ${record.last_name}`;
       const rowData = [
-        record.first_name,
-        record.last_name,
+        fullName,
         record.email,
-        record.phone,
-        record.image, // Update this to show the image, as needed
+        `+${record.phone}`,
+        record.image,
       ];
       tableRows.push(rowData);
     });
-
-    const imageColumnIndex = 4;
-
-    // Add the image to each row using a loop
-    data.forEach((record, index) => {
-      // Assuming that the 'record.image' contains a valid image URL or Data URI
-      doc.addImage(
-        record.image, // URL or Data URI of the image
-        // "PNG", // Image format (JPEG, PNG, etc.)
-        10, // X-coordinate position
-        20 + index * 10, // Y-coordinate position (you can adjust the value as needed)
-        10, // Image width
-        10 // Image height
-      );
-
-      // Update the 'rowData' with the image element
-      tableRows[index][imageColumnIndex] = {
-        // Add the image element to the table cell
-        image: doc.previousImage,
-        alignment: "left", // Adjust the alignment as needed
-      };
-    });
-    // didDrawCell:(data)=>{
-    //   if(data.section==="body"&& data.column.index===5){
-    //     doc.addImage(data.cell.row,
-    //       "jPEG,png,jpg,heic",
-    //       data.cell.x +2,
-    //       data.cell.y+2,
-    //       31.5,25);
-    //   }
-    // })
-    // }
-
-    const columnWidths = [30, 30, 30, 30, 50, 20]; // Example widths, adjust as needed
+    const columnWidths = [40, 40, 40, 50, 40];
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
@@ -467,10 +440,8 @@ const TableComponent = () => {
         2: { columnWidth: columnWidths[2] },
         3: { columnWidth: columnWidths[3] },
         4: { columnWidth: columnWidths[4] },
-        5: { columnWidth: columnWidths[5] },
       },
     });
-
     doc.save("table_data.pdf");
   };
 
@@ -479,8 +450,6 @@ const TableComponent = () => {
     { label: "Last Name", key: "last_name" },
     { label: "Email", key: "email" },
     { label: "Phone", key: "phone" },
-
-    // Add more headers for your table data
   ];
 
   return (
@@ -488,11 +457,7 @@ const TableComponent = () => {
       <Card style={{ borderRadius: "20px", borderBottom: "white" }}>
         <CardContent>
           <Toolbar className="head-layout">
-            <Typography
-              variant="h6"
-              // component="div"
-            ></Typography>
-
+            <Typography variant="h6"></Typography>
             <TextField
               label="Search by Name"
               value={searchQuery}
@@ -535,7 +500,6 @@ const TableComponent = () => {
                   style={{ textDecorationLine: "none", fontSize: "16px" }}
                 >
                   csv
-                  {/* <i class="fas fa-file-csv"></i> */}
                 </CSVLink>
               </IconButton>
             </div>
@@ -548,7 +512,7 @@ const TableComponent = () => {
             }}
           >
             {filteredData.length > 0 ? (
-              <TableContainer sx={{ maxHeight: 450 }}>
+              <TableContainer>
                 <Table
                   stickyHeader
                   aria-label="sticky table"
@@ -557,10 +521,7 @@ const TableComponent = () => {
                   <TableHead sx={{}}>
                     <TableRow>
                       <TableCell>
-                        <b> First Name</b>
-                      </TableCell>
-                      <TableCell>
-                        <b>Last Name</b>
+                        <b>Name</b>
                       </TableCell>
                       <TableCell>
                         <b> Email</b>
@@ -572,7 +533,6 @@ const TableComponent = () => {
                         <b>Image</b>
                       </TableCell>
                       <TableCell></TableCell>
-
                       <TableCell
                         style={{
                           padding: "30px",
@@ -591,39 +551,21 @@ const TableComponent = () => {
                       )
                       .map((record, index) => (
                         <TableRow key={index}>
-                          <TableCell>{record.first_name}</TableCell>
-                          <TableCell>{record.last_name}</TableCell>
+                          <TableCell>{`${record.first_name} ${record.last_name}`}</TableCell>
+
                           <TableCell>{record.email}</TableCell>
-                          <TableCell>{record.phone}</TableCell>
+                          <TableCell>{`+${record.phone}`}</TableCell>
                           <TableCell
                             style={{
                               maxWidth: "50px",
                               maxHeight: "20px",
                             }}
                           >
-                            {/* <ModalImage
-                          small={record.image}
-                          large={record.image}
-                          alt="Hello World!"
-                          style={{ height: "50px", width: "80px" }}
-                        /> */}
-
-                            <Fancybox
-                              options={{
-                                Carousel: {
-                                  infinite: false,
-                                },
-                              }}
-                            >
-                              <a data-fancybox="gallery">
-                                <img
-                                  alt=""
-                                  src={record.image}
-                                  width="80"
-                                  height="80"
-                                />
-                              </a>
-                            </Fancybox>
+                            <ModalImage
+                              small={record.image}
+                              large={record.image}
+                              style={{ height: "50px", width: "80px" }}
+                            />
                           </TableCell>
                           <TableCell
                             style={{
@@ -675,21 +617,20 @@ const TableComponent = () => {
                 No records found.
               </Typography>
             )}
-            <Box display="flex" justifyContent="flex-end" sx={{ mt: 2 }}>
+            <Box
+              display="flex"
+              justifyContent="flex-end"
+              style={{ marginTop: "0px", marginBottom: "0px" }}
+            >
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
                 count={data.length}
                 rowsPerPage={rowsPerPage}
+                sx={{ marginBottom: "0px" }}
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-                SelectProps={{
-                  renderValue: (value) => `${value} rows`, // Custom label for the dropdown button
-                }}
-                MenuItemProps={{
-                  style: { fontSize: 14, margin: "1px" }, // Custom style for the dropdown options
-                }}
               />
             </Box>
           </Paper>
@@ -720,7 +661,9 @@ const TableComponent = () => {
                 }}
               />
               {errors.first_name && (
-                <p style={{ color: "red" }}>{errors.first_name}</p>
+                <p style={{ color: "red", marginBottom: "auto" }}>
+                  {errors.first_name}
+                </p>
               )}
               <TextField
                 label="Last Name"
@@ -735,7 +678,9 @@ const TableComponent = () => {
                 }}
               />
               {errors.last_name && (
-                <p style={{ color: "red" }}>{errors.last_name}</p>
+                <p style={{ color: "red", marginBottom: "auto" }}>
+                  {errors.last_name}
+                </p>
               )}
               <TextField
                 label="Email"
@@ -750,14 +695,17 @@ const TableComponent = () => {
                   // borderWidth: "2px",
                 }}
               />
-              {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
+              {errors.email && (
+                <p style={{ color: "red", marginBottom: "auto" }}>
+                  {errors.email}
+                </p>
+              )}
               <PhoneInput
                 value={phoneNumber}
                 onChange={handlephoneChange}
                 country={"in"}
                 inputStyle={{
                   paddingTop: "1.2rem",
-                  // margin:"5px",
                   paddingBottom: "1.2rem",
                   height: "calc(1.5em+1.25rem+2px)",
                   width: "100%",
@@ -780,7 +728,12 @@ const TableComponent = () => {
                   return isValidPhoneNumber("+" + value);
                 }}
                 defaultErrorMessage="Please enter valid number"
-              />  {errors.phone && <p style={{ color: "red" }}>{errors.phone}</p>}
+              />{" "}
+              {errors.phone && (
+                <p style={{ color: "red", marginBottom: "auto" }}>
+                  {errors.phone}
+                </p>
+              )}
               <TextField
                 // label="Image"
                 type="file"
@@ -789,6 +742,19 @@ const TableComponent = () => {
                 fullWidth
                 onChange={handlePhotoChange}
               />
+              {imagePreviewUrl && (
+                <div>
+                  <img
+                    src={imagePreviewUrl}
+                    alt="Preview"
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      objectFit: "cover",
+                    }}
+                  />
+                </div>
+              )}
               {errors.image && <p style={{ color: "red" }}>{errors.image}</p>}
             </Box>
           </DialogContent>
@@ -826,7 +792,9 @@ const TableComponent = () => {
               }}
             />
             {errors.first_name && (
-              <p style={{ color: "red" }}>{errors.first_name}</p>
+              <p style={{ color: "red", marginBottom: "auto" }}>
+                {errors.first_name}
+              </p>
             )}
             <TextField
               label="Last Name"
@@ -841,7 +809,9 @@ const TableComponent = () => {
               fullWidth
             />
             {errors.last_name && (
-              <p style={{ color: "red" }}>{errors.last_name}</p>
+              <p style={{ color: "red", marginBottom: "auto" }}>
+                {errors.last_name}
+              </p>
             )}
             <TextField
               label="Email"
@@ -855,10 +825,14 @@ const TableComponent = () => {
               }}
               fullWidth
             />
-            {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
+            {errors.email && (
+              <p style={{ color: "red", marginBottom: "auto" }}>
+                {errors.email}
+              </p>
+            )}
             <PhoneInput
-              value={phoneNumber}
-              onChange={handlephoneChange}
+              value={editedPhoneNumber}
+              onChange={handlephoneChange2}
               country={"in"}
               inputStyle={{
                 paddingTop: "1.2rem",
@@ -871,7 +845,6 @@ const TableComponent = () => {
                 fontFamily: "Poppins",
                 fontSize: "17px",
               }}
-              dropdownStyle={{ fontFamily: "Poppins" }}
               buttonStyle={{
                 background: "#c5d3e380",
               }}
@@ -883,11 +856,15 @@ const TableComponent = () => {
                 return isValidPhoneNumber("+" + value);
               }}
               defaultErrorMessage="Please enter valid number"
-            /> {errors.image && <p style={{ color: "red" }}>{errors.image}</p>}
+            />{" "}
+            {errors.phone && (
+              <p style={{ color: "red", marginBottom: "auto" }}>
+                {errors.phone}
+              </p>
+            )}
             <TextField
               size="small"
               type="file"
-              // value={editedImagePreviewUrl}
               name="image"
               onChange={handlePhotoChange2}
               fullWidth
@@ -906,7 +883,6 @@ const TableComponent = () => {
                 />
               </div>
             )}
-
             {errors.image && <p style={{ color: "red" }}>{errors.image}</p>}
           </Box>
         </DialogContent>

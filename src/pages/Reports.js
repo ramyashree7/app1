@@ -12,13 +12,6 @@ function Reports() {
   };
   const [collapsed, setCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
-
-  // useEffect(() => {
-  //   if (!localStorage.getItem("loggedin")) {
-  //     navigate("/login");
-  //   }
-  // });
-
   const handleCollapsedChange = () => {
     setCollapsed(!collapsed);
   };

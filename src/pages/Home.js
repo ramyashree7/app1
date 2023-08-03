@@ -13,20 +13,12 @@ function Home() {
   };
   const [collapsed, setCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
-
-  // useEffect(() => {
-  //   if (!localStorage.getItem("accessToken")) {
-  //     navigate("/login");
-  //   }
-  // });
-
   const handleCollapsedChange = () => {
     setCollapsed(!collapsed);
   };
   const handleToggleSidebar = (value) => {
     setToggled(value);
   };
-
   return (
     <div>
           <div className={`app ${toggled ? "toggled" : ""}`}>
@@ -36,17 +28,13 @@ function Home() {
           handleCollapsedChange={handleCollapsedChange}
           handleToggleSidebar={handleToggleSidebar}
         />
-         <main >
-         
+         <main >     
          <div className=" btnn">
           <div className="btn-toggle" onClick={() => handleToggleSidebar(true)}>
             <FaBars />
           </div>
           <header style={{border:'none'}}>
-            <div
-                className=""
-              
-              >
+            <div>
                 <button
                   className="mx-2 py-2 px-5"
                   size="lg"
@@ -65,9 +53,6 @@ function Home() {
              </div>
              <TableComponent/>
         </main>
-     
-          
-       
       </div>
       </div>
   );

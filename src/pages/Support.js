@@ -2,9 +2,7 @@
 import Navbar from "../component/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-
 import { useEffect, useState } from "react";
-// import { Support } from "@mui/icons-material";
 function Support() {
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -13,13 +11,6 @@ function Support() {
   };
   const [collapsed, setCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
-
-  // useEffect(() => {
-  //   if (!localStorage.getItem("loggedin")) {
-  //     navigate("/login");
-  //   }
-  // });
-
   const handleCollapsedChange = () => {
     setCollapsed(!collapsed);
   };

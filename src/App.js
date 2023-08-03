@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PrivateRoutes from "./component/PrivateRoutes";
-// PAGES
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Reports from "./pages/Reports";
@@ -25,10 +24,8 @@ export default function App() {
           </Route>
           <Route path="/register" element={<Registerpage />} />
           <Route path="/login" element={<Loginpage />} />
-
           <Route path="/products" element={<Products />} />
-          <Route path="/modal" element={<Modal />} />
-
+          {/* <Route path="/modal" element={<Modal />} /> */}
           <Route path="/reports" element={<Reports />} />
           <Route path="/team" element={<Team />} />
           <Route path="/messages" element={<Messages />} />

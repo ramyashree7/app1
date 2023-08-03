@@ -82,8 +82,10 @@ function Registerpage() {
     if (e.target.name === "email") {
       if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(e.target.value)) {
         setValid({ ...valid, email: true });
+        setErrors({ ...errors, email: "" });
       } else {
         setValid({ ...valid, email: false });
+        setErrors({ ...errors, email: "Email is invalid" });
       }
     }
     if (e.target.name === "password") {
@@ -238,9 +240,13 @@ function Registerpage() {
                           type="email"
                           onChange={handleChange}
                           name="email"
-                          error={!valid.email}
-                          helperText={!valid.email && "Invalid email address"}
+                      
                         />
+                          {!valid.email && (
+                          <span style={{ color: "red" }}>
+                            {errors.email}
+                          </span>
+                        )}
                       </FormControl>
                       <FormControl
                         sx={{ m: 1, width: "35ch" }}
@@ -257,8 +263,7 @@ function Registerpage() {
                           onChange={handleChange}
                           name="password"
                           label="Password"
-                          error={!valid.password}
-                          helperText={!valid.password && errors.password}
+                         
                           endAdornment={
                             <InputAdornment position="end">
                               <IconButton
@@ -276,6 +281,11 @@ function Registerpage() {
                             </InputAdornment>
                           }
                         />
+                         {!valid.password && (
+                          <span style={{ color: "red" }}>
+                            {errors.password}
+                          </span>
+                        )}
                       </FormControl>
 
                       <div

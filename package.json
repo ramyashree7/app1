@@ -29,6 +29,7 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.31",
+    "libphonenumber-js": "^1.10.39",
     "material-react-table": "^1.14.0",
     "mdb-react-ui-kit": "^6.1.0",
     "node-sass": "^7.0.3",

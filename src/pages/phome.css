@@ -26,18 +26,12 @@
   .head-layout {
   flex-direction: column;
   margin-left: 5px;
- 
-  /* justify-content: flex-end; */
-  /* column-gap: 2px; */
   }
-  
 }
 .icons{
- 
   margin-top: 0%;
   margin-left: 0;
   margin-bottom: 0;
- 
 }
 @media (max-width: 844px) {
 .icons{
@@ -45,5 +39,4 @@
 margin-left: 70px;
 margin-bottom: 10px;
 }
-
 }

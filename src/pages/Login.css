@@ -4,12 +4,3 @@ flex-direction: column;
 justify-content: center;
 align-items: center;
 }
-
-/* @media (max-width: 768px) {
-  .btnn {
-    justify-content: space-between;
-  }
-  main {
-    background-color: #beebd4;
-  }
-} */

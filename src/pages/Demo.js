@@ -2,7 +2,6 @@ import Navbar from "../component/Navbar";
 import TableComponent from "./Phome";
 import { Link, useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-
 import { useEffect, useState } from "react";
 function Demo() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -13,20 +12,17 @@ function Demo() {
   };
   const [collapsed, setCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
-
   useEffect(() => {
     if (!localStorage.getItem("accessToken")) {
       navigate("/login");
     }
   });
-
   const handleCollapsedChange = () => {
     setCollapsed(!collapsed);
   };
   const handleToggleSidebar = (value) => {
     setToggled(value);
   };
-
   return (
     <div>
       <div className={`app ${toggled ? "toggled" : ""}`}>
