@@ -327,7 +327,7 @@ const TableComponent = () => {
   const handleEditClick = (index) => {
     const recordToEdit = data[index - 1];
     // const recordToEdit = data.find((record) => record.index === index);
-    console.log(recordToEdit);
+ 
     setEditedRecord({ ...recordToEdit });
     setEditedPhoneNumber(recordToEdit.phone);
     setPreviousImagePreviewUrl(recordToEdit.image);
@@ -344,8 +344,8 @@ const TableComponent = () => {
         bodyFormData1,
         access
       );
-      console.log(editedRecord.id);
-      console.log(response2);
+      // console.log(editedRecord.id);
+      // console.log(response2);
       if (response2.data.responseCode === 200) {
         setShowEditDialog(false);
         fetchPosts();
@@ -373,8 +373,8 @@ const TableComponent = () => {
       const response3 = await axios
         .delete(`${url}/user/delete_profile/${recordToDeleteIndex}`, access)
         .then((response3) => {
-          console.log(response3);
-          console.log("deleted", recordToDeleteIndex);
+          // console.log(response3);
+          // console.log("deleted", recordToDeleteIndex);
           toast.success("Data is deleted successfully", {
             position: toast.POSITION.TOP_RIGHT,
           });
@@ -755,7 +755,7 @@ const TableComponent = () => {
                   />
                 </div>
               )}
-              {errors.image && <p style={{ color: "red" }}>{errors.image}</p>}
+              {errors.image && <p style={{ color: "red" ,marginBottom: "auto"}}>{errors.image}</p>}
             </Box>
           </DialogContent>
           <DialogActions>
@@ -883,7 +883,7 @@ const TableComponent = () => {
                 />
               </div>
             )}
-            {errors.image && <p style={{ color: "red" }}>{errors.image}</p>}
+            {errors.image && <p style={{ color: "red" ,marginBottom: "auto"}}>{errors.image}</p>}
           </Box>
         </DialogContent>
         <DialogActions>
