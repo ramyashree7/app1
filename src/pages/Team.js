@@ -10,6 +10,12 @@ function Team() {
     localStorage.removeItem("accessToken");
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (!localStorage.getItem("access_token")) {
+      navigate("/login");
+    }
+  });
   const [collapsed, setCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const handleCollapsedChange = () => {
@@ -18,6 +24,7 @@ function Team() {
   const handleToggleSidebar = (value) => {
     setToggled(value);
   };
+
   return (
     <div className={`app ${toggled ? "toggled" : ""}`}>
         <Navbar

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 function Reports() {
   const navigate = useNavigate();
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
+    localStorage.removeItem("access_token");
     navigate("/login");
   };
   const [collapsed, setCollapsed] = useState(false);
@@ -18,6 +18,13 @@ function Reports() {
   const handleToggleSidebar = (value) => {
     setToggled(value);
   };
+
+  useEffect(() => {
+    if (!localStorage.getItem("access_token")) {
+      navigate("/login");
+    }
+  });
+
   return (
     <div className={`app ${toggled ? "toggled" : ""}`}>
         <Navbar

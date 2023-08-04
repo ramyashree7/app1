@@ -12,6 +12,7 @@ import {
   MDBCheckbox,
 } from "mdb-react-ui-kit";
 import "./Login.css"
+import EmailIcon from "@mui/icons-material/Email";
 import GoogleIcon from "@mui/icons-material/Google";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
@@ -227,25 +228,26 @@ function Registerpage() {
                 <div className="d-flex flex-column  mx-5  justify-content-center  my-0  ">
                   <form onSubmit={handleSubmit}>
                     <div className="input1">
-                      <FormControl
+                    <FormControl
                         sx={{ m: 1, width: "35ch" }}
-                        variant="outlined"
-                      >
-                        <TextField
+                        variant="outlined" >
+                        <InputLabel htmlFor="outlined-adornment-password">
+                          Email
+                        </InputLabel>
+                        <OutlinedInput
                           id="outlined-multiline-flexible"
                           label="Email"
-                          multiline
-                          maxRows={4}
                           value={input.email}
                           type="email"
                           onChange={handleChange}
                           name="email"
-                      
-                        />
-                          {!valid.email && (
-                          <span style={{ color: "red" }}>
-                            {errors.email}
-                          </span>
+                          endAdornment={
+                            <InputAdornment position="end">
+                              {" "}
+                              <EmailIcon />
+                            </InputAdornment> } />
+                        {!valid.email && (
+                          <span style={{ color: "red" }}>{errors.email}</span>
                         )}
                       </FormControl>
                       <FormControl

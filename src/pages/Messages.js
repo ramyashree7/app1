@@ -2,13 +2,19 @@
 import Navbar from "../component/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { FaBars } from "react-icons/fa";
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 function  Messages() {
   const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (!localStorage.getItem("access_token")) {
+      navigate("/login");
+    }
+  });
   const [collapsed, setCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const handleCollapsedChange = () => {

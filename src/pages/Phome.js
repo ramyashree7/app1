@@ -14,10 +14,10 @@ import { PhoneNumber, isValidPhoneNumber } from "libphonenumber-js";
 import { makeStyles } from "@mui/styles";
 import ModalImage from "react-modal-image";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
-import html2canvas from "html2canvas";
 import { Button } from "@mui/material";
 import { CSVLink } from "react-csv";
+import autoTable from "jspdf-autotable";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Table,
   TableHead,
@@ -36,6 +36,10 @@ import {
   TextField,
   Box,
   useMediaQuery,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  InputAdornment,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { Add, Edit, Delete } from "@mui/icons-material";
@@ -101,16 +105,20 @@ const TableComponent = () => {
     try {
       const response = await axios.get(`${url}/user/list_profile`, access);
       setData(response.data.responseData);
+      // setFilteredData(response.data.responseData);
     } catch (error) {
       console.error("Error fetching method:", error);
     }
   };
+
+
   const access_token = localStorage.getItem("access_token");
   const access = {
     headers: {
       autherization: access_token,
     },
   };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -267,7 +275,6 @@ const TableComponent = () => {
           position: toast.POSITION.TOP_RIGHT,
         });
         setShowAddDialog(false);
-        // fetchPosts();
       } else {
         toast.error(response1.data.responseMessage, {
           position: toast.POSITION.TOP_RIGHT,
@@ -279,6 +286,30 @@ const TableComponent = () => {
       });
     }
   };
+  const [filteredData, setFilteredData] = useState(data);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const handleSearch = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.get(`${url}/user/search=${searchText}`, access,{
+        params: {
+          query: searchText,
+        },
+      });
+      setFilteredData(response.data);
+    } catch (error) {
+      console.error("Error searching data:", error);
+    }
+  };
+
+
+  const handleChangeSearch = (e) => {
+    setSearchText(e.target.value);
+  };
+
+
+
 
   const handleChange2 = (e) => {
     const { name, value } = e.target;
@@ -288,6 +319,11 @@ const TableComponent = () => {
     }));
     validateField(name, value);
   };
+
+
+
+
+
 
   const handlePhotoChange2 = (event) => {
     const file = event.target.files[0];
@@ -326,8 +362,7 @@ const TableComponent = () => {
 
   const handleEditClick = (index) => {
     const recordToEdit = data[index - 1];
-    // const recordToEdit = data.find((record) => record.index === index);
- 
+
     setEditedRecord({ ...recordToEdit });
     setEditedPhoneNumber(recordToEdit.phone);
     setPreviousImagePreviewUrl(recordToEdit.image);
@@ -344,8 +379,6 @@ const TableComponent = () => {
         bodyFormData1,
         access
       );
-      // console.log(editedRecord.id);
-      // console.log(response2);
       if (response2.data.responseCode === 200) {
         setShowEditDialog(false);
         fetchPosts();
@@ -373,8 +406,6 @@ const TableComponent = () => {
       const response3 = await axios
         .delete(`${url}/user/delete_profile/${recordToDeleteIndex}`, access)
         .then((response3) => {
-          // console.log(response3);
-          // console.log("deleted", recordToDeleteIndex);
           toast.success("Data is deleted successfully", {
             position: toast.POSITION.TOP_RIGHT,
           });
@@ -390,59 +421,73 @@ const TableComponent = () => {
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState(data);
-  useEffect(() => {
-    const filteredResults = data.filter((record) => {
-      const fullName = `${record.first_name} ${record.last_name}`.toLowerCase();
-      return fullName.includes(searchQuery.toLowerCase());
-    });
-    setFilteredData(filteredResults);
-  }, [data, searchQuery]);
+  // const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
+  // const [filteredData, setFilteredData] = useState(data);
+  // useEffect(() => {
+  //   const filteredResults = data.filter((record) => {
+  //     const fullName = `${record.first_name} ${record.last_name}`.toLowerCase();
+  //     return fullName.includes(searchQuery.toLowerCase());
+  //   });
+  //   setFilteredData(filteredResults);
+  // }, [data, searchQuery]);
 
-  const handleChangeSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  // const handleChangeSearch = (e) => {
+  //   setSearchQuery(e.target.value);
+  // };
   const generatePDF = (data) => {
+    const pdfHeaders = [
+      {
+        id: "first_name",
+        label: "First Name",
+      },
+      {
+        id: "last_name",
+        label: "Last Name",
+      },
+      {
+        id: "phone",
+        label: "Phone Number",
+      },
+      {
+        id: "email",
+        label: "Email",
+      },
+      {
+        id: "image",
+        label: "Image",
+      },
+    ];
     const doc = new jsPDF();
-    const tableColumn = ["Name", "Email", "Phone", "Image"];
-    const tableRows = [];
-    const urlToImageObject = async (url) => {
-      const canvas = await html2canvas(document.createElement("img"));
-      const imgData = url.startsWith("data:image")
-        ? url
-        : canvas.toDataURL(url);
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = imgData;
-      });
-    };
 
-    data.forEach((record) => {
-      const fullName = `${record.first_name} ${record.last_name}`;
-      const rowData = [
-        fullName,
-        record.email,
-        `+${record.phone}`,
-        record.image,
-      ];
-      tableRows.push(rowData);
-    });
-    const columnWidths = [40, 40, 40, 50, 40];
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
+    autoTable(doc, {
+      margin: { top: 20 },
+      theme: "grid",
+      body: data,
+      bodyStyles: { minCellHeight: 15 },
       columnStyles: {
-        0: { columnWidth: columnWidths[0] },
-        1: { columnWidth: columnWidths[1] },
-        2: { columnWidth: columnWidths[2] },
-        3: { columnWidth: columnWidths[3] },
-        4: { columnWidth: columnWidths[4] },
+        0: { cellWidth: 23 },
+        1: { cellWidth: 23 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 45 },
+        4: { cellWidth: 35 },
+      },
+      styles: { minCellHeight: 1 },
+      columns: pdfHeaders.map((c) => ({ header: c.label, dataKey: c.id })),
+
+      didDrawCell: (data) => {
+        if (data.section === "body" && data.column.index === 4) {
+          doc.addImage(
+            data.cell.raw,
+            "JPEG, png, jpg, heic",
+            data.cell.x + 2,
+            data.cell.y + 2,
+            31.5,
+            25
+          );
+        }
       },
     });
-    
     doc.save("table_data.pdf");
   };
 
@@ -459,14 +504,28 @@ const TableComponent = () => {
         <CardContent>
           <Toolbar className="head-layout">
             <Typography variant="h6"></Typography>
-            <TextField
-              label="Search by Name"
-              value={searchQuery}
-              onChange={handleChangeSearch}
-              size="small"
-              variant="outlined"
-              style={{ width: "250px" }}
-            />
+            <form onSubmit={handleSearch}>
+              <FormControl>
+                <InputLabel htmlFor="outlined-adornment-password">
+                  Search by Name
+                </InputLabel>
+                <OutlinedInput
+                  id="outlined-multiline-flexible"
+                  label="Search by Name"
+                  value={searchText}
+                  onChange={handleChangeSearch}
+                  size="small"
+                  variant="outlined"
+                  style={{ width: "270px" }}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      {" "}
+                      <SearchIcon />
+                    </InputAdornment>
+                  }
+                />
+              </FormControl>
+            </form>
             <div className="icons">
               <IconButton
                 color="primary"
@@ -521,23 +580,28 @@ const TableComponent = () => {
                 >
                   <TableHead sx={{}}>
                     <TableRow>
-                      <TableCell>
+                      <TableCell style={{ textAlign: "start" }}>
                         <b>Name</b>
                       </TableCell>
-                      <TableCell>
+                      <TableCell style={{ textAlign: "center" }}>
                         <b> Email</b>
                       </TableCell>
-                      <TableCell>
+                      <TableCell style={{ textAlign: "center" }}>
                         <b>Phone</b>
                       </TableCell>
-                      <TableCell>
-                        <b>Image</b>
-                      </TableCell>
-                      <TableCell></TableCell>
                       <TableCell
                         style={{
-                          padding: "30px",
-                          marginLeft: "30px",
+                          textAlign: "center",
+                          height: "50px",
+                          width: "50px",
+                        }}
+                      >
+                        <b>Image</b>
+                      </TableCell>
+
+                      <TableCell
+                        style={{
+                          textAlign: "end",
                         }}
                       >
                         <b> Action</b>
@@ -554,37 +618,49 @@ const TableComponent = () => {
                         <TableRow key={index}>
                           <TableCell>{`${record.first_name} ${record.last_name}`}</TableCell>
 
-                          <TableCell>{record.email}</TableCell>
-                          <TableCell>{`+${record.phone}`}</TableCell>
-                          <TableCell
-                            style={{
-                              maxWidth: "50px",
-                              maxHeight: "20px",
-                            }}
-                          >
-                            <ModalImage
-                              small={record.image}
-                              large={record.image}
-                              style={{ height: "50px", width: "80px" }}
-                            />
+                          <TableCell style={{ textAlign: "center" }}>
+                            {record.email}
                           </TableCell>
                           <TableCell
-                            style={{
-                              padding: "10px",
-                            }}
-                          ></TableCell>
+                            style={{ textAlign: "center" }}
+                          >{`+${record.phone}`}</TableCell>
                           <TableCell
                             style={{
-                              padding: "10px",
+                              width: "50px",
+                              height: "50px",
+                              textAlign: "center",
+                            }}
+                          >
+                                <ModalImage
+                              small={record.image}
+                              large={record.image}
+                              
+                              style={{ height: "50px", width: "80px",
+                            ".img":{height:"50px",width:"50px"} }}
+                            >
+                            </ModalImage>
+                            {/* <img
+                              style={{
+                                width: "50px",
+                                height: "50px",
+                                objectFit: "cover",
+                              }}/> */}
+                          </TableCell>
+
+                        
+
+                          <TableCell
+                            style={{
+                              textAlign: "end",
                             }}
                           >
                             <IconButton
-                              sx={{ p: "1" }}
+                              // sx={{ p: "1" }}
                               color="primary"
                               style={{
                                 gap: "5",
                                 backgroundColor: "#eeeeee",
-                                margin: "20px",
+                                margin: "10px",
                               }}
                               onClick={() => handleEditClick(record.index)}
                             >
@@ -595,7 +671,7 @@ const TableComponent = () => {
                               style={{
                                 gap: "5",
                                 backgroundColor: "#eeeeee",
-                                marginLeft: "17px",
+                                marginRight: "10px",
                               }}
                               sx={{ m: "1" }}
                               color="secondary"
@@ -628,7 +704,15 @@ const TableComponent = () => {
                 component="div"
                 count={data.length}
                 rowsPerPage={rowsPerPage}
-                sx={{ marginBottom: "0px" }}
+                sx={{
+                  marginBottom: "0px",
+                  ".css-pdct74-MuiTablePagination-selectLabel": {
+                    marginBottom: "0px",
+                  },
+                  ".css-levciy-MuiTablePagination-displayedRows": {
+                    marginBottom: "0px",
+                  },
+                }}
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
@@ -637,6 +721,7 @@ const TableComponent = () => {
           </Paper>
         </CardContent>
       </Card>
+
       <Card>
         <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}>
           {/* <Card style={{ overflowX: isMobileView ? "auto" : "hidden" }}> */}
@@ -756,7 +841,11 @@ const TableComponent = () => {
                   />
                 </div>
               )}
-              {errors.image && <p style={{ color: "red" ,marginBottom: "auto"}}>{errors.image}</p>}
+              {errors.image && (
+                <p style={{ color: "red", marginBottom: "auto" }}>
+                  {errors.image}
+                </p>
+              )}
             </Box>
           </DialogContent>
           <DialogActions>
@@ -884,7 +973,11 @@ const TableComponent = () => {
                 />
               </div>
             )}
-            {errors.image && <p style={{ color: "red" ,marginBottom: "auto"}}>{errors.image}</p>}
+            {errors.image && (
+              <p style={{ color: "red", marginBottom: "auto" }}>
+                {errors.image}
+              </p>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>

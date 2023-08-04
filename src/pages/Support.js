@@ -9,6 +9,12 @@ function Support() {
     localStorage.removeItem("accessToken");
     navigate("/login");
   };
+
+  useEffect(() => {
+    if (!localStorage.getItem("access_token")) {
+      navigate("/login");
+    }
+  });
   const [collapsed, setCollapsed] = useState(false);
   const [toggled, setToggled] = useState(false);
   const handleCollapsedChange = () => {
