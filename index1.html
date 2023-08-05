@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+        }
+      .mydiv {
+        /* border:5px outset black; */
+        /* text-align:center; */
+        /* margin-top: 40px;
+  margin-bottom: 40px; */
+        margin-right: 10px;
+        margin-left: 20px;
+        padding: 10px;
+        /* border-radius: 10px; */
+      }
+      .grid-container {
+        display: grid;
+        /* grid-template-areas:
+    'header header header header header header'
+    'menu main main main right right'
+    'menu footer footer footer footer footer'; */
+        gap: 10px;
+        background-color: #2196f3;
+        padding: 10px;
+      }
+      .grid-container .item1 {
+        background-color: rgb(189, 214, 238);
+        display: flex;
+        /* justify-content: center; */
+        align-items: center;
+        flex-direction: column;
+        padding: 25px;
+        margin: 25px;
+        border-radius: 20px;
+      }
+      .grid-container .item1 label {
+        margin-top: 15px;
+      }
+      .grid-container .item1 input {
+        width: 500px;
+      }
+      .grid-container .item2 {
+        background-color: rgb(118, 180, 235);
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+        flex-direction: row;
+        padding: 35px;
+    
+        margin: 35px;
+        border-radius: 10px;
+        border: 2px solid;
+  padding: 10px;
+  box-shadow: 5px 10px #ecbbbb;
+      }
+      .grid-container .item2 input {
+        width: 50px;
+      }
+      .grid-container .item3:hover{
+        background-color: rgb(118, 180, 235);
+        display: flex;
+        justify-content: center; 
+        align-items: center;
+        flex-direction: column;
+        padding: 35px;
+        margin: 35px;
+        border-radius: 10px;
+        border: 2px solid;
+  padding: 10px;
+  box-shadow: 0 0 11px rgba(33,33,33,.2);
+      }
+      .grid-container .item4 {
+        background-color: aliceblue;
+        display: flex;
+        /* justify-content: center; */
+        align-items: center;
+        flex-direction: column;
+        padding: 25px;
+        margin: 25px;
+        border-radius: 20px;
+      }
+      .grid-container .item4 input {
+        width: 450px;
+      }
+      .grid-container .item4 label {
+        margin-top: 25px;
+        margin-bottom: 35px;
+      }
+      .mydiv10 {
+        /* margin-top: 10px; */
+        /* margin-bottom: 10px; */
+        margin-right: 10px;
+        margin-left: 60px;
+        padding: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .grid-container .item1 input {
+        width: 250px;
+      }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>My Feedback Form</h1>
+    <form>
+      <div class="grid-container">
+        <div class="item1">
+          <!-- <li> -->
+            <label for="Name">Name</label> 
+            <input type="text" id="Name" />
+          <!-- </li> -->
+          <!-- <br /> -->
+          <!-- <li> -->
+            <label for="email">Email</label> 
+            <input type="email" id="email" />
+          <!-- </li> -->
+          <!-- <br /> -->
+          <!-- <li> -->
+            <label for="password">password</label>
+            <input type="password" id="password" />
+          <!-- </li> -->
+        </div>
+      <div class="item2">
+        <div>
+          <h3>Please check all the emotions that apply to you:</h3>
+        </div>
+        <div class="mydiv10">
+          <input type="checkbox" value="Angry" />Angry  <input
+            type="checkbox"
+            value="Sad"
+          />Sad <input type="checkbox" value="Happy" />Happy
+          <input type="checkbox" value="Ambivalent" />Ambivalent
+        </div>
+        </div>
+<div class ="item3">
+        <div class="mydiv">
+          <h3>How satisfied were you with our service?</h3>
+        </div>
+
+        <div>
+          <input type="radio" value="Very satisfeid" />Very satisfeid
+          <input type="radio" value="satisfeid" />satisfeid  <input
+            type="radio"
+            value="Didn't care"
+          />Didn't care <input type="radio" value="Dissatisfeid" />Dissatisfeid
+          <input type="radio" value="Very Dissatisfeid" />Very Dissatisfeid
+        </div>
+        </div>
+        <div class="mydiv">
+            <div class="item4">
+          <li>
+            <label for="Text">Further Comments:</label> <input type="text" />
+          </li>
+          <li>
+            <label for="photo">Bio photo:</label>
+            <input type="text" />
+            <button type="button">Choose....</button>
+          </li>
+          <li>
+            <label for="locationb">Location visited:</label>
+            <select id="location">
+              <option value="Moodabidri">Moodabidri</option>
+              <option value="Mysore">Mysore</option>
+              <option value="mangalore">Mangalore</option>
+              <option value="bagalore">Banglore</option>
+            </select>
+          </li>
+        </div>
+    </div>
+        <div class="mydiv10"><input type="submit" /></div>
+      </div>
+    </form>
+  </body>
+</html>

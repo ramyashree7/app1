@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in</title>
+    <script src="https://kit.fontawesome.com/d5fd51acf9.js" crossorigin="anonymous"></script>
+    <style>
+        *{
+            margin: 0;
+        }
+
+        body{
+      display: flex; 
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      background-image:url('./assets/istockphoto-1322277517-612x612.jpg');
+      background-repeat: no-repeat;
+    background-color: antiquewhite;
+   background-size: cover;
+   background-position: center; 
+ 
+    }
+     .grid-container {
+        display: flex;
+        justify-content: center;
+        align-items: center ; 
+        /* background-color: #dacde7; */
+        width: 100vw;
+        height: 100vh;
+        }
+        .grid-container .item1{
+          background: transparent;
+        padding: 80px;
+        display: flex;
+        flex-direction:column;
+        justify-content: center; 
+        align-items: center;
+        
+        border-radius: 30px;
+        border: 1px solid rgb(41, 6, 81);
+        box-shadow: rgba(246, 245, 247, 0.2) 0px 7px 29px 0px;
+
+        }
+        .grid-container .item1 input{
+            margin-top: 20px;
+            padding:10px;
+            width:220px;
+            display: flex;
+            border-radius: 10px;
+            text-align: center;
+            align-items: center;
+            border: 2px white;
+        font-family: CerebriSans-Regular, -apple-system, system-ui, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+        }
+      
+
+        
+        .grid-container .item1 .input-icons1 i{
+            width: 100px;
+            margin-right:135px;
+            padding-top: 20px;
+        position: absolute;
+            margin-block-start: 10px;
+            /* margin-right: 60px; */
+            width: 0%;
+            /* padding: 10px; */
+            text-align-last: center;
+         min-width: 40px; 
+        }
+        .grid-container .item1 .input-icons2 i{
+        width: 100px;
+        margin-right: 135px;
+        padding-top: 20px;
+        padding-left: 10px;
+        position: absolute;
+        margin-block-start:10px ;
+        min-width: 40%;
+        }
+        .grid-container .field-icon {
+  float: right;
+  margin-left: 195px;
+  margin-top: -26px;
+  position: relative;
+  z-index: 2;
+  
+}
+
+p{
+padding: 2px 2px;
+  margin: 5px 0;
+}
+.grid-container .item1 button{
+  
+  background: transparent;
+ 
+  transition: 0.5s;
+  letter-spacing: 2px;
+  
+  padding: 14px 20px;
+  margin: 30px 0;
+ 
+  border-radius: 20px;
+  cursor: pointer;
+  width: 55%;
+}
+ .grid-container .item1 button:hover{
+  background:#fff;
+  color: rgb(192, 43, 226);
+  letter-spacing:1px;
+}
+.grid-container .item1:hover {
+  box-shadow: 3px 3px 6px rgb(255, 214, 176);
+}
+       
+</style>
+<script>
+  function validate()
+  {
+    var email=document.getElementById("t1").value;
+  var pswd=document.getElementById("t2").value;
+  var email1=/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}/
+  var pswd1=/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,10}$/
+
+  if(email=='')
+    {
+      alert('please provide your email');
+      return false;
+    }
+   else if(!email1.test(email))
+		{
+			alert('please enter correct email id');
+      return false;
+		}
+    else if(pswd=='')
+    {
+      alert('please enter password ');
+      return false;
+    }
+    else if(document.getElementById("t3").value.length < 6)
+    {
+      alert('pasword must be greater than 6');
+      return false;
+    } 
+    else if( document.getElementById("t3").value.length > 12)
+    {
+alert('please enter correct password');
+return false;
+    }
+    else{
+      alert('Successfully registered please login.');
+      return true;
+    }
+  }
+  function myFunction() {
+  var x = document.getElementsByClassName("field-icon");
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}
+</script>
+</head>
+<body>
+  <form action="#"onsubmit="validate()">
+    <div class="grid-container">
+        <div class="item1">
+            <h1><center>Sign In</center></h1>
+            <div class="input-icons1">
+                <i class="fa-regular fa-envelope-open"></i>
+    <input type="email"id="t1"name="email"placeholder="E-mail"/></div>
+    <div class="input-icons2">
+        <i class="fa-solid fa-lock fa"></i>
+    <input type="password" id="t2"name="password"placeholder="Password"/></div>
+  <div class="field-icon" ><span toggle="#password-field" class="fa-solid fa-eye-slash"aria-hidden="false" onclick="myFunction"></span></div>
+  <button onsubmit="validate()"type="submit">Login</button>
+  <p>Forgot <span style="color:rgb(4, 4, 4);font-weight:bold"> Username/Password?</p>
+  <p>Don't have an account? <span style="color:rgb(9, 9, 9);font-weight:bold"> <a href="./sample.html">Sign Up</a></p>
+</div>
+</div>
+  </form>  
+</body>
+</html>

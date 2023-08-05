@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let x;
+        let y;
+        let z;
+        document.getElementById("rollButton")
+        function fun(){
+        x=Math.floor(Math.random()*6)+1;
+        y=Math.floor(Math.random()*6)+1;
+        z=Math.floor(Math.random()*6)+1;
+        document.getElementById("xlabel").innerHTML=x;
+        document.getElementById("ylabel").innerHTML=y;
+        document.getElementById("zlabel").innerHTML=z;
+     }
+    </script>
+    
+</head>
+<body>
+    <h2>Random number generator</h2>
+   
+    <label id="xlabel"></label><br>
+    <label id="ylabel"></label><br>
+    <label id="zlabel"></label><br>
+    <button type="button"id="rollButton"onclick="fun()">roll</button>
+</body>
+</html>
+
+

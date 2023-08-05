@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        *{
+            margin:0;
+        }
+        .body{
+            background-color: black;
+            width: 100vw;
+        height: 100vh;
+        }
+        .grid-container {
+        display: flex;
+        justify-content: center;
+        align-items: center ; 
+        background-color: #8d2561;
+        width: 100vw;
+        height: 100vh;
+        /* margin-bottom: 1%;
+        margin-top: 1%; */
+        }
+        .grid-container .item1{
+            display: flex;
+            flex-direction:column;
+            /* margin-top: 70px; */
+            padding: 90px;
+            justify-content:right; 
+        align-items: right;
+        text-align: center;
+            background-color: #7d074c;
+            /* height: 80%; */
+        }
+        
+        .grid-container .item1 .item10 input{
+            /* display: flex; */
+            flex-direction:column;
+            /* margin-top: 70px; */
+            /* padding: 90px; */
+            justify-content:right; 
+        align-items: center;
+        text-align: center;
+            background-color: #7d074c;
+            width: 100%;
+            /* height: 10%; */
+        }
+
+
+  
+    </style>
+</head>
+<body>
+    <form>
+        <div class="grid-container">
+            
+            <div class="item1">
+                <div class="item10">
+        <label for="Name">Name:</label>
+        <input type="text"Placeholder="Your Name"/>
+        </div>
+
+        <div class="item3">
+        <label for="Email">Email:</label>
+        <input typ="email"name="email"placeholder="Your email">
+        </div>
+        <div class="item4">
+        <label for="Password">Password:</label>
+        <input type="password"name="password">
+        </div>
+        <div class="item5">
+        <label for="phone">Phone Number:</label>
+        <input type="number">
+        </div>
+        <div class="item3">
+        <label for="Gender">Gender:</label>
+        <label for="male">Male:</label>
+        <input type="radio">
+        <label for="male">Female:</label>
+        <input type="radio">
+        <label for="male">other:</label>
+        <input type="radio"/></div>
+        <div class="item2">
+    <label for="languages">Languages:</label>
+        <select name="languages"id="Languages">
+        <option value="Kannada">Kannada</option>
+        <option value="English">English</option>
+        <option value="Hindhi">Hindhi</option>
+        <option value="Thulu">Thulu</option>
+        </select>
+    </div>
+        <br><br>
+    </div>
+
+</div>
+        </form>
+</body>
+</html>
