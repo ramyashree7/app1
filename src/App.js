@@ -10,7 +10,7 @@ function App() {
   useEffect(() => {
     const url = "https://jsonplaceholder.typicode.com/comments";
     fetch(url, {
-      companyId: "4677474747447477",
+      companyId: "46774747474474773",
     })
       .then((response) => response.json())
       .then((json) => {
