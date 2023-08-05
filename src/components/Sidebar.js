@@ -94,7 +94,7 @@ const Sidebar = ({
               to="/profile"
             >
               <FaUser />
-              <span>My Account</span>
+              <span>My Account .........</span>
             </Link>
           </div>
         </SidebarFooter>
