@@ -1,0 +1,15 @@
+.gradient-custom-2 {
+    
+    background:	#35ca7d;
+    
+  
+   
+  }
+  body {
+    background-color:#e1e1e1;
+  }
+ .error {
+  color: red;
+  color: #35ca7d;
+  margin: -5px 0 10px;
+}
