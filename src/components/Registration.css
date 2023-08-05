@@ -1,0 +1,44 @@
+
+body{
+    background-color: antiquewhite;
+}
+.container{
+    margin-top: 100px;
+    padding-top: 20px;
+    background-color: antiquewhite;
+    display: flex;
+    justify-content: center;
+    text-align:start;
+    box-sizing: border-box;
+    border: 20px;
+    border-color: black;
+    border-radius: 20px;
+}
+.container:hover{
+    background-color: aliceblue;
+}
+.check{
+    display: flex;
+    align-items: start;
+    text-align: start;
+}
+.btn{
+   
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    margin-bottom: 20px;
+    background: white;
+    cursor: pointer;
+    color: black;
+}
+.btn :hover{
+   
+    opacity: 0.3;
+}
+.btn-btn{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+}
