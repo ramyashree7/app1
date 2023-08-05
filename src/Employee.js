@@ -21,7 +21,6 @@ const Employee = () => {
     const handlePostShow = () => { SetPostShow(true) }
     const hanldePostClose = () => { SetPostShow(false) }
 
-    //Define here local state that store the form Data
     const [name, setname] = useState("")
     const [email, setemail] = useState("")
     const [number, setnumber] = useState("")
