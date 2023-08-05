@@ -1,0 +1,49 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../chart"
+		},
+		{
+			"path": "../chart2"
+		},
+		{
+			"path": "../crudapi5"
+		},
+		{
+			"path": "../crudapi8"
+		},
+		{
+			"path": "../curd"
+		},
+		{
+			"path": "../curdapi"
+		},
+		{
+			"path": "../curdapi2"
+		},
+		{
+			"path": "../curdapi3"
+		},
+		{
+			"path": "../curdapi4"
+		},
+		{
+			"path": "../dashboard"
+		},
+		{
+			"path": "../dashboard2"
+		},
+		{
+			"path": "../dashboard3"
+		},
+		{
+			"path": "../dashboard4"
+		},
+		{
+			"path": "../dashboard5"
+		}
+	]
+}
