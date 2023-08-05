@@ -3,10 +3,10 @@ import "./phome.css";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import config from "../config.json";
-import { toast } from "react-toastify";
+import { toast,ToastContainer} from "react-toastify";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import "react-toastify/dist/ReactToastify.css";
-import PhoneInput from "react-phone-input-2";
+import PhoneInput from "react-phone-input-2"
 import "react-phone-input-2/lib/style.css";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -99,7 +99,7 @@ const TableComponent = () => {
   });
   useEffect(() => {
     fetchPosts();
-  }, [data]);
+  }, []);
 
   const fetchPosts = async () => {
     try {
@@ -289,20 +289,35 @@ const TableComponent = () => {
   const [filteredData, setFilteredData] = useState(data);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [searchSuccess, setSearchSuccess] = useState(false);
+  useEffect(() => {
+    if (searchSuccess) {
+      toast.success("Data searched successfully", {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      setSearchSuccess(false); 
+    }
+  }, [searchSuccess]);
   const handleSearch = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.get(`${url}/user/search=${searchText}`, access,{
+      const response = await axios.get(`${url}/user/search/${event.target.value}`, access,{
         params: {
           query: searchText,
         },
       });
-      setFilteredData(response.data);
+      if (response.data.responseCode === 200) {
+        setData(response.data.responseData); 
+        setSearchSuccess(true); 
+      } else {
+        toast.error(response.data.responseMessage, {
+          position: toast.POSITION.TOP_RIGHT,
+        });
+      }
     } catch (error) {
       console.error("Error searching data:", error);
     }
   };
-
 
   const handleChangeSearch = (e) => {
     setSearchText(e.target.value);
@@ -504,7 +519,7 @@ const TableComponent = () => {
         <CardContent>
           <Toolbar className="head-layout">
             <Typography variant="h6"></Typography>
-            <form onSubmit={handleSearch}>
+            {/* <form onSubmit={handleSearch}> */}
               <FormControl>
                 <InputLabel htmlFor="outlined-adornment-password">
                   Search by Name
@@ -512,8 +527,9 @@ const TableComponent = () => {
                 <OutlinedInput
                   id="outlined-multiline-flexible"
                   label="Search by Name"
-                  value={searchText}
-                  onChange={handleChangeSearch}
+                  // value={search  Text}
+                  // onChange={handleChangeSearch}
+                  onChange={handleSearch}
                   size="small"
                   variant="outlined"
                   style={{ width: "270px" }}
@@ -525,7 +541,13 @@ const TableComponent = () => {
                   }
                 />
               </FormControl>
-            </form>
+              <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        closeOnClick={true}
+        pauseOnHover={true}
+      />
+            {/* </form> */}
             <div className="icons">
               <IconButton
                 color="primary"
@@ -571,7 +593,7 @@ const TableComponent = () => {
               boxShadow: "none",
             }}
           >
-            {filteredData.length > 0 ? (
+            {data.length > 0 ? (
               <TableContainer>
                 <Table
                   stickyHeader
@@ -609,7 +631,7 @@ const TableComponent = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {filteredData
+                    {data
                       .slice(
                         page * rowsPerPage,
                         page * rowsPerPage + rowsPerPage
