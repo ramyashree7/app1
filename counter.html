@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #countlabel{
+
+            display: block;
+            text-align: center;
+            font-size: 50px;
+        }
+        .button{
+            display:flex; 
+            justify-content: center;
+            text-align: center; 
+        }
+    </style>
+    <script>
+        let count=0;
+        document.getElementById("countlabel").innerText=count;
+     function increment(){
+            count+=1;
+            document.getElementById("countlabel").innerHTML=count;
+        }
+        function decrement(){
+            count-=1;
+            document.getElementById("countlabel").innerHTML=count;
+        }
+        function reset(){
+            count=0;
+            document.getElementById("countlabel").innerHTML=count;
+        }
+    </script>
+</head>
+<body>
+    <label id="countlabel">0</label><br>
+    <div class="d-block"style="margin-left:577px;width:auto">
+    <button id="decreasebtn" onclick="decrement()" >decrease</button>
+    <button id="resetbtn"onclick="reset()">reset</button>
+    <button id="increasebtn"onclick="increment()">increase</button>
+</div>
+
+</body>
+</html>

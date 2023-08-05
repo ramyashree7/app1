@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <title>Fahrenheit to Celcius Temperature Converter</title>
+  <style>
+    *{
+        margin: 0;
+    }
+    body{
+      display: block; 
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      background-image:url('./assets/istockphoto-1322277517-612x612.jpg');
+      background-repeat: no-repeat;
+      /* background-color: antiquewhite; */
+      background-size: cover;
+      background-position: center; 
+ 
+    }
+    .grid-container {
+        display: flex;
+        justify-content:center;
+        align-items: center ; 
+        /* background-color: #dacde7; */
+        width: 100vw;
+        height: 100vh;
+        }
+  </style>
+  <body>
+    <!-- <div class="grid-container"> -->
+    <h2 style="text-align: center;margin-top: 100px;">Temperature Converter</h2>
+    <p style="text-align: center;margin-top: 50px;">Type a value in the Fahrenheit field to convert the value to Celsius:</p>
+
+    <p style="text-align:center;margin-top:20px;">
+      <label>Fahrenheit</label>
+      <input 
+        id="inputFahrenheit"
+        type="number"
+        placeholder="Fahrenheit"
+        oninput="temperatureConverter(this.value)"
+        onchange="temperatureConverter(this.value)"
+      />
+    </p>
+    <p style="text-align:center;margin-left:-175px;margin-top:10px;">Celcius: <span id="outputCelcius"></span></p>
+</div>
+
+    <script>
+      function temperatureConverter(valNum) {
+        valNum = parseFloat(valNum);
+        document.getElementById("outputCelcius").innerHTML =
+          (valNum - 32) / 1.8;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+     function changesize(){
+        document.getElementById("img1").style.width="500px";
+       
+     }
+     function changesize1(){
+        document.getElementById("img1").style.width="250px";
+     }
+     function clickevent()
+	{
+		document.write("This is JavaTpoint");
+	}
+    function focusevent()
+	{
+		document.getElementById("input1").style.background=" aqua";
+	}
+    function keydownevent()  
+    {  
+        document.getElementById("input2");  
+        alert("Pressed a key");  
+    }  
+    function fun1() {  
+alert("Welcome to the javaTpoint.com");  
+}  
+
+    
+    </script>
+</head>
+<body>
+    <h1>Onmouseover and Onmouseout</h1>
+    <img src="./assets/positive-business-woman-posing-camera-outdoors.jpg" alt="" style="width: 250px;"id="img1"Onmouseover="changesize()"Onmouseout="changesize1()">
+    <form>
+        <h2>click</h2>
+        <input type="button" onclick="clickevent()" value="Who's this?"/>
+        </form>
+
+        <h2> Onfocus event</h2>
+        <input type="text" id="input1" onfocus="focusevent()"/>
+        <h2>keydown event</h2>
+        <input type="text" id="input2" onkeydown="keydownevent()"/>  
+        <p> Example of the addEventListener() method. </p>  
+        <p> Click the following button to see the effect. </p>  
+
+        <button id = "btn"> Click me </button>
+         <p id = "para"></p>
+         <h3> This is an example of using onclick event. </h3>  
+<p> Click the following text to see the effect. </p>  
+<p id = "para1">Click me</p>  
+         
+         <script>
+            document.getElementById("btn").addEventListener("click", fun);
+    function fun() {
+    document.getElementById("para").innerHTML = "Hello World" + "<br>" + "Welcome to the  javaTpoint.com";
+    }
+
+    document.getElementById("para1").onclick = function() {  
+fun3()  
+};  
+function fun3() {  
+document.getElementById("para1").innerHTML = "Welcome to the javaTpoint.com";  
+document.getElementById("para1").style.color = "blue";  
+document.getElementById("para1").style.backgroundColor = "yellow";  
+document.getElementById("para1").style.fontSize = "25px";  
+document.getElementById("para1").style.border = "4px solid red";   
+}  
+    
+         </script>
+<h3> onclick  </h3>  
+<p> Click the following button to see the effect. </p>  
+<button onclick = "fun1()">Click me</button>  
+
+
+
+
+</body>
+</html>
