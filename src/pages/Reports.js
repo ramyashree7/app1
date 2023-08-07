@@ -40,7 +40,7 @@ function Reports() {
             <FaBars />
           </div>
             <div
-                className=""
+            
               
               >
                 <button

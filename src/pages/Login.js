@@ -52,7 +52,7 @@ function Loginpage() {
       newErrors.email = "";
     }
     if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,10}$/.test(
+      !/^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])[a-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]*$/.test(
         input.password
       )
     ) {
@@ -76,6 +76,7 @@ function Loginpage() {
         body: JSON.stringify(input),
       });
       const data = await response.json();
+      console.log(data);
       if (data.responseCode === 200) {
         localStorage.setItem("access_token", data.responseData.access_token);
         toast.success("Login successful!", {
@@ -105,7 +106,7 @@ function Loginpage() {
     }
     if (e.target.name === "password") {
       if (
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,10}$/.test(
+        /^(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])[a-z\d!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]*$/.test(
           e.target.value
         )
       ) {

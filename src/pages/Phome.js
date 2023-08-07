@@ -10,7 +10,7 @@ import PhoneInput from "react-phone-input-2"
 import "react-phone-input-2/lib/style.css";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { PhoneNumber, isValidPhoneNumber } from "libphonenumber-js";
+import {phoneNumber,  isValidPhoneNumber } from "libphonenumber-js";
 import { makeStyles } from "@mui/styles";
 import ModalImage from "react-modal-image";
 import jsPDF from "jspdf";
@@ -62,6 +62,7 @@ const TableComponent = () => {
   const [variant, setVariant] = React.useState("soft");
   const [color, setColor] = React.useState("neutral");
   const url = config.url;
+  const url1=config.url
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -72,6 +73,8 @@ const TableComponent = () => {
   const [editedPhoneNumber, setEditedPhoneNumber] = useState("");
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [previousImagePreviewUrl, setPreviousImagePreviewUrl] = useState("");
+  const [reducedValue, forceUpdate] = React.useReducer((x) => x + 1, 0);
+  const [isRowLength, setIsRowLength] = React.useState(0);
   const [newRecord, setNewRecord] = useState({
     first_name: "",
     last_name: "",
@@ -99,13 +102,15 @@ const TableComponent = () => {
   });
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [reducedValue]);
 
   const fetchPosts = async () => {
     try {
       const response = await axios.get(`${url}/user/list_profile`, access);
       setData(response.data.responseData);
+      setIsRowLength(response.data.responseData.length);
       // setFilteredData(response.data.responseData);
+      console.log(response);
     } catch (error) {
       console.error("Error fetching method:", error);
     }
@@ -300,6 +305,10 @@ const TableComponent = () => {
   }, [searchSuccess]);
   const handleSearch = async (event) => {
     event.preventDefault();
+    if (event.target.value === "") {
+      forceUpdate(data);
+    }
+
     try {
       const response = await axios.get(`${url}/user/search/${event.target.value}`, access,{
         params: {
@@ -308,8 +317,13 @@ const TableComponent = () => {
       });
       if (response.data.responseCode === 200) {
         setData(response.data.responseData); 
-        setSearchSuccess(true); 
-      } else {
+        setIsRowLength(response.data.responseData.length);
+      
+      } 
+      else if (response.data.responseCode === 212) {
+        setData("");
+        setIsRowLength((response.data.responseData.length = 0));
+      }else {
         toast.error(response.data.responseMessage, {
           position: toast.POSITION.TOP_RIGHT,
         });
@@ -322,10 +336,6 @@ const TableComponent = () => {
   const handleChangeSearch = (e) => {
     setSearchText(e.target.value);
   };
-
-
-
-
   const handleChange2 = (e) => {
     const { name, value } = e.target;
     setEditedRecord((prevEditedRecord) => ({
@@ -424,6 +434,7 @@ const TableComponent = () => {
           toast.success("Data is deleted successfully", {
             position: toast.POSITION.TOP_RIGHT,
           });
+          forceUpdate();
         });
       setShowDeleteDialog(false);
     } catch (error) {
@@ -436,20 +447,7 @@ const TableComponent = () => {
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // const [searchQuery, setSearchQuery] = useState("");
-  // const [searchQuery, setSearchQuery] = useState("");
-  // const [filteredData, setFilteredData] = useState(data);
-  // useEffect(() => {
-  //   const filteredResults = data.filter((record) => {
-  //     const fullName = `${record.first_name} ${record.last_name}`.toLowerCase();
-  //     return fullName.includes(searchQuery.toLowerCase());
-  //   });
-  //   setFilteredData(filteredResults);
-  // }, [data, searchQuery]);
 
-  // const handleChangeSearch = (e) => {
-  //   setSearchQuery(e.target.value);
-  // };
   const generatePDF = (data) => {
     const pdfHeaders = [
       {
@@ -653,6 +651,7 @@ const TableComponent = () => {
                               textAlign: "center",
                             }}
                           >
+                           <img src={`${url1}${record.image}`} alt='' />
                                 <ModalImage
                               small={record.image}
                               large={record.image}
@@ -745,7 +744,7 @@ const TableComponent = () => {
       </Card>
 
       <Card>
-        <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}>
+        <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)}  forceUpdate={forceUpdate}>
           {/* <Card style={{ overflowX: isMobileView ? "auto" : "hidden" }}> */}
           <DialogTitle sx={{ textAlign: "center" }}>Add New Record</DialogTitle>
           <DialogContent>
@@ -879,7 +878,7 @@ const TableComponent = () => {
           {/* </Card> */}
         </Dialog>
       </Card>
-      <Dialog open={showEditDialog} onClose={() => setShowEditDialog(false)}>
+      <Dialog open={showEditDialog} onClose={() => setShowEditDialog(false)}  forceUpdate={forceUpdate}>
         <DialogTitle sx={{ textAlign: "center" }}>Edit Record</DialogTitle>
         <DialogContent>
           <Box

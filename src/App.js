@@ -10,7 +10,6 @@ import NotFound from "./pages/NotFound";
 import Team from "./pages/Team";
 import Messages from "./pages/Messages";
 import Support from "./pages/Support";
-import Modal from "./pages/Modal";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer } from "react-toastify";
@@ -25,12 +24,11 @@ export default function App() {
           <Route path="/register" element={<Registerpage />} />
           <Route path="/login" element={<Loginpage />} />
           <Route path="/products" element={<Products />} />
-          {/* <Route path="/modal" element={<Modal />} /> */}
           <Route path="/reports" element={<Reports />} />
           <Route path="/team" element={<Team />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/support" element={<Support />} />
-          <Route path="/not-found" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
       <ToastContainer />
