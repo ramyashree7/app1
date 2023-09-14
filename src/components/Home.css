@@ -1,0 +1,17 @@
+.btnn {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    box-shadow: none;
+  }
+  /* @media (max-width: 768px) {
+    .btnn {
+      justify-content: space-between; 
+    }
+    main {
+      background-color: #beebd4;
+    }
+  }
+  .btn-toggle{
+    margin-top: -10px;
+  } */
