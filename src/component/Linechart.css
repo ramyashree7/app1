@@ -1,0 +1,39 @@
+.content{
+    margin-top: 50px;
+}
+.Linechart{
+    transform: translateX(-3.5%);
+    margin-top: 10px;
+     height:70vh; 
+     width:80vw;
+}
+.btnn3 {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: -49px;
+    margin-left: -19px;
+  }
+  @media (max-width: 769px) {
+    .btnn3 {
+      justify-content: space-between; 
+      font-size: 20px;
+      margin-left: 16px;
+      margin-top: -195px;
+    }
+  }
+  .btn-toggle3{
+    margin-top: -346px;
+  }
+@media (max-width: 769px) {
+    .content{
+        margin-top: 190px;
+        margin-right: 55px;
+    }
+    .Linechart{
+        margin-top: 10px;
+        transform: translateX(-13%);
+         height:70vh; 
+         width:100vw;
+    }
+}

@@ -1,0 +1,121 @@
+.heading {
+  margin-top: -39px;
+  margin-right: 1200px;
+}
+.buttons {
+  margin-right: 25px;
+  margin-top: -90px;
+}
+.Box1 {
+  margin-top: 0px;
+  margin-left: 79px;
+  width: 100%;
+}
+.Box1a {
+  margin-top: 0px;
+  margin-left: 1px;
+  width: 100%;
+}
+.Box1b {
+  margin-top: 0px;
+  margin-left: 157px;
+  width: 100%;
+}
+.Box1c {
+  margin-top: 0px;
+  margin-left: 236px;
+  width: 100%;
+}
+.chart1 {
+  width: 100%;
+  margin-top: 25px;
+  padding: 0 30px;
+  padding-top: 10px;
+  margin-left: -290px;
+}
+
+.chart2 {
+  width: 100%;
+  margin-top: 25px;
+  margin-left: -290px;
+}
+.chart3 {
+  width: 100%;
+  margin-top: 25px;
+  margin-left: -291px;
+}
+
+.chart4 {
+  width: 100%;
+  margin-top: 25px;
+  margin-left: -290px;
+}
+.chart5 {
+  width: 100%;
+  margin-left: 1075px;
+  margin-top: -971px;
+}
+
+@media (max-width: 769px) {
+  .heading {
+    margin-right: 90px;
+    margin-top: 16px;
+    transform: translateX(-2%);
+    justify-content: center;
+  }
+  .buttons {
+    margin-left: -6px;
+    margin-top: -10px;
+  }
+  .Box1 {
+    margin-top: 5px;
+    transform: translateX(-0%);
+    width: 97%;
+  }
+  .Box1a {
+    margin-top: 5px;
+    transform: translateX(-2%);
+    width: 97%;
+  }
+  .Box1b {
+    margin-top: 5px;
+    transform: translateX(-27%);
+    width: 97%;
+  }
+  .Box1c {
+    margin-top: 5px;
+    margin-left: 73px;
+    width: 97%;
+  }
+  .chart1 {
+    transform: translateX(1%);
+    width: 2007%;
+    margin-top: 8px;
+    padding: 0 0px;
+    padding-top: 0px;
+    margin-top: 5px;
+  }
+
+  .chart2 {
+    margin-top: 10px;
+    width: 2009%;
+    transform: translateX(1%);
+  }
+  .chart3 {
+    width: 2009%;
+    margin-top: 10px;
+    transform: translateX(1%);
+  }
+
+  .chart4 {
+    width: 2009%;
+    margin-top: 10px;
+    transform: translateX(1%);
+  }
+
+  .chart5 {
+    max-width: 95%;
+    margin-left: -3px;
+    margin-top: -15px;
+  }
+}

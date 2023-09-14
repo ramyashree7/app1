@@ -1,0 +1,40 @@
+.content {
+  margin-top: 50px;
+}
+.barchart {
+  transform: translateX(-4.9%);
+  margin-top: 10px;
+  height: 70vh;
+  width: 80vw;
+}
+
+.btnn1 {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: -49px;
+  margin-left: -19px;
+}
+@media (max-width: 769px) {
+  .btnn1 {
+    justify-content: space-between;
+    font-size: 20px;
+    margin-left: 19px;
+    margin-top: -195px;
+  }
+}
+.btn-toggle1 {
+  margin-top: -350px;
+}
+@media (max-width: 769px) {
+  .content {
+    margin-top: 190px;
+    margin-right: 25px;
+  }
+  .barchart {
+    margin-top: 10px;
+    transform: translateX(-2%);
+    height: 60vh;
+    width: 70vw;
+  }
+}

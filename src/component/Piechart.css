@@ -1,0 +1,39 @@
+.content {
+  margin-top: 50px;
+}
+.piechart {
+  transform: translateX(-4.9%);
+  margin-top: 10px;
+  height: 70vh;
+  width: 80vw;
+}
+.btnn2 {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: -49px; 
+   margin-left: -19px;
+}
+@media (max-width: 769px) {
+  .btnn2 {
+    justify-content: space-between;
+    font-size: 20px;
+    margin-left:16px;
+    margin-top: -195px;
+  }
+}
+.btn-toggle2 {
+  margin-top: -350px;
+}
+@media (max-width: 769px) {
+  .content {
+    margin-top: 190px;
+    margin-left: 29px;
+  }
+  .piechart {
+    margin-top: 10px;
+    transform: translateX(-18%);
+    height: 60vh;
+    width: 60vw;
+  }
+}

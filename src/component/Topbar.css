@@ -1,0 +1,71 @@
+.topbar-container {
+  margin-left: 35px;
+  margin-top: 20px; 
+}
+.mobile-icons-container {
+  margin-left:1435px;
+  margin-top:-40px;
+}
+.inputbase {
+  display: flex;
+  flex: 1;
+  margin-left: 20px;
+  border-radius: 3px;
+  padding: 5px 10px;
+  width:200px
+}
+.IconButton {
+  margin-left: 10px; 
+  color: #fff; 
+}
+.searchbar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0.4rem;
+  border-radius: 4px;
+  margin-right: 0;
+}
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red; /* Customize the badge color */
+  color: white; /* Customize the text color */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+@media (max-width: 769px) {
+  .topbar-container {
+    margin-left: 49px;
+    margin-top: 20px;
+  }
+  .searchbar {
+  display: flex;
+  margin-top: 20px;
+  margin-left: 10px;
+  margin-bottom: 1rem;
+  }
+  .mobile-sidebar-toggle {
+    margin-top: 10px; 
+  }
+.mobile-icons-container {
+  margin-left:170px;
+  margin-top:-40px;
+}
+.inputbase {
+  display: flex;
+  flex: 1;
+  margin-left: 2px;
+  border-radius: 3px;
+  padding: 5px 10px;
+  width:120px
+}
+}
